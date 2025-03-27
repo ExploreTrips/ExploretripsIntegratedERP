@@ -28,7 +28,7 @@ This system is built with scalability and flexibility in mind, allowing business
     -      Automated inventory updates and alerts.
     -      Support for multiple warehouses and locations.
 -   **Sales and CRM:**
-    -      Customer relationship management (CRM) features.
+    Customer relationship management (CRM) features.
     -      Sales order processing and tracking.
     -      Quotation and invoice generation.
 -   **Purchasing:**
