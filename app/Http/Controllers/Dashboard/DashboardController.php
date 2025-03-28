@@ -17,9 +17,7 @@ class DashboardController extends Controller
 
     public function account_dashboard_index()
     {
-
         if (Auth::check()) {
-
             if (Auth::user()->type == 'super admin') {
                 return redirect()->route('client.dashboard.view');
             } elseif (Auth::user()->type == 'client') {

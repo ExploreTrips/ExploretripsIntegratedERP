@@ -15,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'auth' => \App\Http\Middleware\Authenticate::class,
+            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
+            'revalidate' => \App\Http\Middleware\RevalidateBackHistory::class,
+            'pusher' => \App\Http\Middleware\pusherConfig::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

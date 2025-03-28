@@ -26,10 +26,6 @@ require __DIR__ . '/auth.php';
 Route::get('/account-dashboard', [DashboardController::class, 'account_dashboard_index'])->name('dashboard')->middleware('auth');
 Route::get('dashboard', [DashboardController::class, 'clientView'])->name('client.dashboard.view')->middleware('auth');
 
-
-
-
-
 // cache
 Route::get('/config-cache', function () {
     Artisan::call('cache:clear');
