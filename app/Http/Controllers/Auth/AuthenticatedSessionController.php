@@ -82,10 +82,10 @@ class AuthenticatedSessionController extends Controller
         {
             $companyUser = User::where('id' , $user->created_by)->first();
         }
-        if($user != null && $user->is_disable == 0 && $user->type != 'company' && $user->type != 'super admin')
-        {
-            return redirect()->back()->with('status', __('Your Account is disable,please contact your Administrator.'));
-        }
+        // if($user != null &&  $user->type != 'company' && $user->type != 'super admin')
+        // {
+        //     return redirect()->back()->with('status', __('Your Account is disable,please contact your Administrator.'));
+        // }
         // if(($user != null && $user->is_enable_login == 0 || (isset($companyUser) && $companyUser != null) && $companyUser->is_enable_login == 0)  && $user->type != 'super admin')
         // {
         //     return redirect()->back()->with('status', __('Your Account is disable from company.'));
@@ -171,9 +171,7 @@ class AuthenticatedSessionController extends Controller
                 }
             }
         }
-
         $setting = Utility::settingsById($user->creatorId());
-
         $timezone = $setting['timezone'] ? $setting['timezone'] : 'UTC';
         date_default_timezone_set($timezone);
 
@@ -219,11 +217,9 @@ class AuthenticatedSessionController extends Controller
 
         }
         //end for user log
-
         if($user->type =='company' || $user->type =='super admin' || $user->type =='client')
         {
             return redirect()->intended(RouteServiceProvider::HOME);
-
         }
         else
         {
@@ -241,11 +237,8 @@ class AuthenticatedSessionController extends Controller
     public function destroy(Request $request)
     {
         Auth::guard('web')->logout();
-
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
-
         return redirect('/');
     }
 
@@ -263,8 +256,7 @@ class AuthenticatedSessionController extends Controller
 
     public function customerLogin(Request $request)
     {
-
-        $this->validate(
+    $this->validate(
             $request, [
                         'email' => 'required|email',
                         'password' => 'required|min:6',
@@ -291,7 +283,6 @@ class AuthenticatedSessionController extends Controller
 
             return redirect()->route('customer.dashboard');
         }
-
         return $this->sendFailedLoginResponse(0);
     }
 
