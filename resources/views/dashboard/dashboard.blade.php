@@ -109,17 +109,17 @@
                                 <h4>{{__('Mark Attandance')}}</h4>
                             </div>
                             <div class="card-body dash-card-body">
-                                <p class="text-muted pb-0-5">{{__('My Office Time: '.$officeTime['startTime'].' to '.$officeTime['endTime'])}}</p>
+                                <p class="text-muted pb-0-5">{{__('My Office Time:9:30 AM. to .6::00 PM')}}</p>
                                 <center>
                                     <div class="row">
                                         <div class="col-md-6">
-                                            {{Form::open(array('url'=>'attendanceemployee/attendance','method'=>'post'))}}
-                                            @if(empty($employeeAttendance) || $employeeAttendance->clock_out != '00:00:00')
-                                                <button type="submit" value="0" name="in" id="clock_in" class="btn btn-success ">{{__('CLOCK IN')}}</button>
-                                            @else
-                                                <button type="submit" value="0" name="in" id="clock_in" class="btn btn-success disabled" disabled>{{__('CLOCK IN')}}</button>
-                                            @endif
-                                            {{Form::close()}}
+                                            <form action="{{ url('attendanceemployee/attendance') }}" method="POST">
+                                                @csrf
+                                                <button type="submit" value="0" name="in" id="clock_in"
+                                                        class="btn btn-success {{ empty($employeeAttendance) || $employeeAttendance->clock_out != '00:00:00' ? '' : 'disabled' }}">
+                                                    {{ __('CLOCK IN') }}
+                                                </button>
+                                            </form>
                                         </div>
                                         <div class="col-md-6 ">
                                             @if(!empty($employeeAttendance) && $employeeAttendance->clock_out == '00:00:00')

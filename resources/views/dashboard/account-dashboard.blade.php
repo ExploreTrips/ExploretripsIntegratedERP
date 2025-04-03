@@ -3,235 +3,102 @@
     {{__('Dashboard')}}
 @endsection
 @push('script-page')
-    <script>
-        @if(\Auth::user()->can('show account dashboard'))
-        (function () {
-            var chartBarOptions = {
-                series: [
-                    {
-                        name: "{{__('Income')}}",
-                        data:{!! json_encode($incExpLineChartData['income']) !!}
-                    },
-                    {
-                        name: "{{__('Expense')}}",
-                        data: {!! json_encode($incExpLineChartData['expense']) !!}
-                    }
-                ],
-
-                chart: {
-                    height: 250,
-                    type: 'area',
-                    // type: 'line',
-                    dropShadow: {
-                        enabled: true,
-                        color: '#000',
-                        top: 18,
-                        left: 7,
-                        blur: 10,
-                        opacity: 0.2
-                    },
-                    toolbar: {
-                        show: false
-                    }
+<script>
+    (function () {
+        var chartBarOptions = {
+            series: [
+                {
+                    name: "Income",
+                    data: [5000, 7000, 8000, 6000, 7500] // Static Income Data
                 },
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    width: 2,
-                    curve: 'smooth'
-                },
-                title: {
-                    text: '',
-                    align: 'left'
-                },
-                xaxis: {
-                    categories:{!! json_encode($incExpLineChartData['day']) !!},
-                    title: {
-                        text: '{{ __("Date") }}'
-                    }
-                },
-                colors: ['#6fd944', '#ff3a6e'],
-
-
-                grid: {
-                    strokeDashArray: 4,
-                },
-                legend: {
-                    show: false,
-                },
-                // markers: {
-                //     size: 4,
-                //     colors: ['#6fd944', '#FF3A6E'],
-                //     opacity: 0.9,
-                //     strokeWidth: 2,
-                //     hover: {
-                //         size: 7,
-                //     }
-                // },
-                yaxis: {
-                    title: {
-                        text: '{{ __("Amount") }}'
-                    },
-
+                {
+                    name: "Expense",
+                    data: [3000, 4000, 6000, 5000, 6500] // Static Expense Data
                 }
+            ],
+            chart: {
+                height: 250,
+                type: 'area',
+                dropShadow: {
+                    enabled: true,
+                    color: '#000',
+                    top: 18,
+                    left: 7,
+                    blur: 10,
+                    opacity: 0.2
+                },
+                toolbar: { show: false }
+            },
+            xaxis: {
+                categories: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+                title: { text: 'Date' }
+            },
+            colors: ['#6fd944', '#ff3a6e']
+        };
+        var arChart = new ApexCharts(document.querySelector("#cash-flow"), chartBarOptions);
+        arChart.render();
+    })();
 
-            };
-            var arChart = new ApexCharts(document.querySelector("#cash-flow"), chartBarOptions);
-            arChart.render();
-        })();
-
-        (function () {
-            var options = {
-                chart: {
-                    height: 180,
-                    type: 'bar',
-                    toolbar: {
-                        show: false,
-                    },
+    (function () {
+        var options = {
+            series: [
+                {
+                    name: "Income",
+                    data: [4000, 6000, 7000] // Static Income Data
                 },
-                dataLabels: {
-                    enabled: false
-                },
-                stroke: {
-                    width: 2,
-                    curve: 'smooth'
-                },
-                series: [{
-                    name: "{{__('Income')}}",
-                    data: {!! json_encode($incExpBarChartData['income']) !!}
-                }, {
-                    name: "{{__('Expense')}}",
-                    data: {!! json_encode($incExpBarChartData['expense']) !!}
-                }],
-                xaxis: {
-                    categories: {!! json_encode($incExpBarChartData['month']) !!},
-                },
-                colors: ['#3ec9d6', '#FF3A6E'],
-                fill: {
-                    type: 'solid',
-                },
-                grid: {
-                    strokeDashArray: 4,
-                },
-                legend: {
-                    show: true,
-                    position: 'top',
-                    horizontalAlign: 'right',
-                },
-                // markers: {
-                //     size: 4,
-                //     colors:  ['#3ec9d6', '#FF3A6E',],
-                //     opacity: 0.9,
-                //     strokeWidth: 2,
-                //     hover: {
-                //         size: 7,
-                //     }
-                // }
-            };
-            var chart = new ApexCharts(document.querySelector("#incExpBarChart"), options);
-            chart.render();
-        })();
-
-        (function () {
-            var options = {
-                chart: {
-                    height: 140,
-                    type: 'donut',
-                },
-                dataLabels: {
-                    enabled: false,
-                },
-                plotOptions: {
-                    pie: {
-                        donut: {
-                            size: '70%',
-                        }
-                    }
-                },
-                series: {!! json_encode($expenseCatAmount) !!},
-                colors: {!! json_encode($expenseCategoryColor) !!},
-                labels: {!! json_encode($expenseCategory) !!},
-                legend: {
-                    show: true
+                {
+                    name: "Expense",
+                    data: [2000, 3000, 5000] // Static Expense Data
                 }
-            };
-            var chart = new ApexCharts(document.querySelector("#expenseByCategory"), options);
-            chart.render();
-        })();
+            ],
+            chart: {
+                height: 180,
+                type: 'bar'
+            },
+            xaxis: {
+                categories: ['Jan', 'Feb', 'Mar'],
+            },
+            colors: ['#3ec9d6', '#FF3A6E']
+        };
+        var chart = new ApexCharts(document.querySelector("#incExpBarChart"), options);
+        chart.render();
+    })();
 
-        (function () {
-            var options = {
-                chart: {
-                    height: 140,
-                    type: 'donut',
-                },
-                dataLabels: {
-                    enabled: false,
-                },
-                plotOptions: {
-                    pie: {
-                        donut: {
-                            size: '70%',
-                        }
-                    }
-                },
-                series: {!! json_encode($incomeCatAmount) !!},
-                colors: {!! json_encode($incomeCategoryColor) !!},
-                labels:  {!! json_encode($incomeCategory) !!},
-                legend: {
-                    show: true
-                }
-            };
-            var chart = new ApexCharts(document.querySelector("#incomeByCategory"), options);
-            chart.render();
-        })();
+    (function () {
+        var options = {
+            series: [40, 30, 20, 10], // Static Expense Data
+            colors: ['#ff3a6e', '#3ec9d6', '#6fd944', '#ffab00'],
+            labels: ['Rent', 'Utilities', 'Supplies', 'Others']
+        };
+        var chart = new ApexCharts(document.querySelector("#expenseByCategory"), options);
+        chart.render();
+    })();
 
-        (function () {
-            var options = {
-                series: [{{ round($storage_limit,2) }}],
-                chart: {
-                    height: 350,
-                    type: 'radialBar',
-                    offsetY: -20,
-                    sparkline: {
-                        enabled: true
-                    }
-                },
-                plotOptions: {
-                    radialBar: {
-                        startAngle: -90,
-                        endAngle: 90,
-                        track: {
-                            background: "#e7e7e7",
-                            strokeWidth: '97%',
-                            margin: 5, // margin is in pixels
-                        },
-                        dataLabels: {
-                            name: {
-                                show: true
-                            },
-                            value: {
-                                offsetY: -50,
-                                fontSize: '20px'
-                            }
-                        }
-                    }
-                },
-                grid: {
-                    padding: {
-                        top: -10
-                    }
-                },
-                colors: ["#6FD943"],
-                labels: ['Used'],
-            };
-            var chart = new ApexCharts(document.querySelector("#limit-chart"), options);
-            chart.render();
-        })();
+    (function () {
+        var options = {
+            series: [50, 20, 15, 15], // Static Income Data
+            colors: ['#6FD943', '#3ec9d6', '#ff3a6e', '#ffab00'],
+            labels: ['Salary', 'Investments', 'Bonus', 'Other']
+        };
+        var chart = new ApexCharts(document.querySelector("#incomeByCategory"), options);
+        chart.render();
+    })();
 
-        @endif
-    </script>
+    (function () {
+        var options = {
+            series: [70], // Static Storage Data
+            chart: {
+                height: 350,
+                type: 'radialBar'
+            },
+            colors: ["#6FD943"],
+            labels: ['Used']
+        };
+        var chart = new ApexCharts(document.querySelector("#limit-chart"), options);
+        chart.render();
+    })();
+</script>
+
 @endpush
 @section('breadcrumb')
     <li class="breadcrumb-item"><a href="{{route('dashboard')}}">{{__('Dashboard')}}</a></li>
@@ -252,10 +119,9 @@
                                                 <i class="ti ti-users"></i>
                                             </div>
                                             <p class="text-muted text-sm mt-4 mb-2">{{__('Total')}}</p>
-                                            <h6 class="mb-3"><a href="{{ route('customer.index') }}" class="dashboard-link">{{__('Customers')}}</a></h6>
-                                            <h3 class="mb-0">{{\Auth::user()->countCustomers()}}
+                                            <h6 class="mb-3"><a href="#" class="dashboard-link">{{__('Customers')}}</a></h6>
+                                            <h3 class="mb-0">100</h3>
 
-                                            </h3>
                                         </div>
                                     </div>
                                 </div>
@@ -266,8 +132,8 @@
                                                 <i class="ti ti-users"></i>
                                             </div>
                                             <p class="text-muted text-sm mt-4 mb-2">{{__('Total')}}</p>
-                                            <h6 class="mb-3"><a href="{{ route('vender.index') }}" class="dashboard-link">{{__('Vendors')}}</a></h6>
-                                            <h3 class="mb-0">{{\Auth::user()->countVenders()}}
+                                            <h6 class="mb-3"><a href="#" class="dashboard-link">{{__('Vendors')}}</a></h6>
+                                            <h3 class="mb-0">50
                                             </h3>
                                         </div>
                                     </div>
@@ -279,8 +145,8 @@
                                                 <i class="ti ti-report-money"></i>
                                             </div>
                                             <p class="text-muted text-sm mt-4 mb-2">{{__('Total')}}</p>
-                                            <h6 class="mb-3"><a href="{{ route('invoice.index') }}" class="dashboard-link">{{__('Invoices')}}</a></h6>
-                                            <h3 class="mb-0">{{\Auth::user()->countInvoices()}} </h3>
+                                            <h6 class="mb-3"><a href="#" class="dashboard-link">{{__('Invoices')}}</a></h6>
+                                            <h3 class="mb-0">65</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -291,8 +157,8 @@
                                                 <i class="ti ti-report-money"></i>
                                             </div>
                                             <p class="text-muted text-sm mt-4 mb-2">{{__('Total')}}</p>
-                                            <h6 class="mb-3"><a href="{{ route('bill.index') }}" class="dashboard-link">{{__('Bills')}}</a></h6>
-                                            <h3 class="mb-0">{{\Auth::user()->countBills()}} </h3>
+                                            <h6 class="mb-3"><a href="#" class="dashboard-link">{{__('Bills')}}</a></h6>
+                                            <h3 class="mb-0">2500</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -302,7 +168,7 @@
                             <div class="card">
                                 <div class="card-header">
                                     <h5>{{__('Income & Expense')}}
-                                        <span class="float-end text-muted">{{__('Current Year').' - '.$currentYear}}</span>
+                                        <span class="float-end text-muted">{{__('Current Year')}}</span>
                                     </h5>
 
                                 </div>
@@ -327,14 +193,27 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            @forelse($bankAccountDetail as $bankAccount)
 
-                                                <tr class="font-style">
-                                                    <td>{{$bankAccount->bank_name}}</td>
-                                                    <td>{{$bankAccount->holder_name}}</td>
-                                                    <td>{{\Auth::user()->priceFormat($bankAccount->opening_balance)}}</td>
-                                                </tr>
-                                            @empty
+
+
+                                            <tr class="font-style">
+                                                <td>ABC Bank</td>
+                                                <td>John Doe</td>
+                                                <td>$10,000</td>
+                                            </tr>
+
+                                            <tr class="font-style">
+                                                <td>XYZ Bank</td>
+                                                <td>Jane Smith</td>
+                                                <td>$5,000</td>
+                                            </tr>
+                                            <tr class="font-style">
+                                                <td>DEF Bank</td>
+                                                <td>Michael Johnson</td>
+                                                <td>$3,000</td>
+                                            </tr>
+
+                                            {{-- @empty --}}
                                                 <tr>
                                                     <td colspan="4">
                                                         <div class="text-center">
@@ -342,7 +221,6 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            @endforelse
                                             </tbody>
                                         </table>
                                     </div>
@@ -365,13 +243,7 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            @forelse($latestIncome as $income)
-                                                <tr>
-                                                    <td>{{\Auth::user()->dateFormat($income->date)}}</td>
-                                                    <td>{{!empty($income->customer)?$income->customer->name:'-'}}</td>
-                                                    <td>{{\Auth::user()->priceFormat($income->amount)}}</td>
-                                                </tr>
-                                            @empty
+
                                                 <tr>
                                                     <td colspan="4">
                                                         <div class="text-center">
@@ -379,7 +251,6 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            @endforelse
                                             </tbody>
                                         </table>
                                     </div>
@@ -402,14 +273,7 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            @forelse($latestExpense as $expense)
 
-                                                <tr>
-                                                    <td>{{\Auth::user()->dateFormat($expense->date)}}</td>
-                                                    <td>{{!empty($expense->vender)?$expense->vender->name:'-'}}</td>
-                                                    <td>{{\Auth::user()->priceFormat($expense->amount)}}</td>
-                                                </tr>
-                                            @empty
                                                 <tr>
                                                     <td colspan="4">
                                                         <div class="text-center">
@@ -417,7 +281,6 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            @endforelse
                                             </tbody>
                                         </table>
                                     </div>
@@ -445,28 +308,7 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            @forelse($recentInvoice as $invoice)
-                                                <tr>
-                                                    <td>{{\Auth::user()->invoiceNumberFormat($invoice->invoice_id)}}</td>
-                                                    <td>{{!empty($invoice->customer_name)? $invoice->customer_name:'' }} </td>
-                                                    <td>{{ Auth::user()->dateFormat($invoice->issue_date) }}</td>
-                                                    <td>{{ Auth::user()->dateFormat($invoice->due_date) }}</td>
-                                                    <td>{{\Auth::user()->priceFormat($invoice->getTotal())}}</td>
-                                                    <td>
-                                                        @if($invoice->status == 0)
-                                                            <span class="p-2 px-3 rounded badge status_badge bg-secondary">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
-                                                        @elseif($invoice->status == 1)
-                                                            <span class="p-2 px-3 rounded badge status_badge bg-warning">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
-                                                        @elseif($invoice->status == 2)
-                                                            <span class="p-2 px-3 rounded badge status_badge bg-danger">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
-                                                        @elseif($invoice->status == 3)
-                                                            <span class="p-2 px-3 rounded badge status_badge bg-info">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
-                                                        @elseif($invoice->status == 4)
-                                                            <span class="p-2 px-3 rounded badge status_badge bg-primary">{{ __(\App\Models\Invoice::$statues[$invoice->status]) }}</span>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @empty
+
                                                 <tr>
                                                     <td colspan="6">
                                                         <div class="text-center">
@@ -474,7 +316,6 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            @endforelse
                                             </tbody>
                                         </table>
                                     </div>
@@ -500,28 +341,7 @@
                                             </tr>
                                             </thead>
                                             <tbody>
-                                            @forelse($recentBill as $bill)
-                                                <tr>
-                                                    <td>{{\Auth::user()->billNumberFormat($bill->bill_id)}}</td>
-                                                    <td>{{!empty($bill->vender_name)? $bill->vender_name : '-' }} </td>
-                                                    <td>{{ Auth::user()->dateFormat($bill->bill_date) }}</td>
-                                                    <td>{{ Auth::user()->dateFormat($bill->due_date) }}</td>
-                                                    <td>{{\Auth::user()->priceFormat($bill->getTotal())}}</td>
-                                                    <td>
-                                                        @if($bill->status == 0)
-                                                            <span class="p-2 px-3 status_badge rounded badge bg-secondary">{{ __(\App\Models\Bill::$statues[$bill->status]) }}</span>
-                                                        @elseif($bill->status == 1)
-                                                            <span class="p-2 px-3 status_badge rounded badge bg-warning">{{ __(\App\Models\Bill::$statues[$bill->status]) }}</span>
-                                                        @elseif($bill->status == 2)
-                                                            <span class="p-2 px-3 status_badge rounded badge bg-danger">{{ __(\App\Models\Bill::$statues[$bill->status]) }}</span>
-                                                        @elseif($bill->status == 3)
-                                                            <span class="p-2 px-3 status_badge rounded badge bg-info">{{ __(\App\Models\Bill::$statues[$bill->status]) }}</span>
-                                                        @elseif($bill->status == 4)
-                                                            <span class="p-2 px-3 status_badge rounded badge bg-primary">{{ __(\App\Models\Bill::$statues[$bill->status]) }}</span>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @empty
+
                                                 <tr>
                                                     <td colspan="6">
                                                         <div class="text-center">
@@ -529,7 +349,6 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            @endforelse
                                             </tbody>
                                         </table>
                                     </div>
@@ -566,7 +385,7 @@
                                                 </div>
                                                 <div class="ms-2">
                                                     <p class="text-muted text-sm mb-0">{{__('Income Today')}}</p>
-                                                    <h4 class="mb-0 text-primary">{{\Auth::user()->priceFormat(\Auth::user()->todayIncome())}}</h4>
+                                                    <h4 class="mb-0 text-primary">500</h4>
                                                 </div>
                                             </div>
                                         </div>
@@ -577,7 +396,7 @@
                                                 </div>
                                                 <div class="ms-2">
                                                     <p class="text-muted text-sm mb-0">{{__('Expense Today')}}</p>
-                                                    <h4 class="mb-0 text-info">{{\Auth::user()->priceFormat(\Auth::user()->todayExpense())}}</h4>
+                                                    <h4 class="mb-0 text-info">1000</h4>
                                                 </div>
                                             </div>
                                         </div>
@@ -588,7 +407,7 @@
                                                 </div>
                                                 <div class="ms-2">
                                                     <p class="text-muted text-sm mb-0">{{__('Income This Month')}}</p>
-                                                        <h4 class="mb-0 text-warning">{{\Auth::user()->priceFormat(\Auth::user()->incomeCurrentMonth())}}</h4>
+                                                        <h4 class="mb-0 text-warning">1200</h4>
                                                 </div>
                                             </div>
                                         </div>
@@ -599,7 +418,7 @@
                                                 </div>
                                                 <div class="ms-2">
                                                     <p class="text-muted text-sm mb-0">{{__('Expense This Month')}}</p>
-                                                    <h4 class="mb-0 text-danger">{{\Auth::user()->priceFormat(\Auth::user()->expenseCurrentMonth())}}</h4>
+                                                    <h4 class="mb-0 text-danger">60000</h4>
                                                 </div>
                                             </div>
                                         </div>
@@ -612,8 +431,8 @@
                             <div class="card">
                                 <div class="card-header">
                                     <h5>{{__('Storage Limit')}}
-{{--                                        <span class="float-end text-muted">{{__('Year').' - '.$currentYear}}</span>--}}
-                                        <small class="float-end text-muted">{{ $users->storage_limit . 'MB' }} / {{ $plan->storage_limit . 'MB' }}</small>
+                                       <span class="float-end text-muted">{{__('Year')}}</span>
+                                        <small class="float-end text-muted">500GB/1000GB</small>
                                     </h5>
                                 </div>
                                 <div class="card-body">
@@ -626,7 +445,8 @@
                             <div class="card">
                                 <div class="card-header">
                                     <h5>{{__('Income By Category')}}
-                                        <span class="float-end text-muted">{{__('Year').' - '.$currentYear}}</span>
+                                        <span class="float-end text-muted">{{__('Year')}}</span>
+
                                     </h5>
                                 </div>
                                 <div class="card-body">
@@ -638,7 +458,7 @@
                             <div class="card">
                                 <div class="card-header">
                                     <h5>{{__('Expense By Category')}}
-                                        <span class="float-end text-muted">{{__('Year').' - '.$currentYear}}</span>
+                                        <span class="float-end text-muted">{{__('Year')}}</span>
                                     </h5>
                                 </div>
                                 <div class="card-body">
@@ -671,7 +491,7 @@
 
                                                         </td>
                                                         <td>
-                                                            <h4 class="text-muted">{{\Auth::user()->priceFormat($weeklyInvoice['invoiceTotal'])}}</h4>
+                                                            <h4 class="text-muted">---</h4>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -680,7 +500,7 @@
                                                             <p class="text-muted text-sm mb-0">{{__('Paid')}}</p>
                                                         </td>
                                                         <td>
-                                                            <h4 class="text-muted">{{\Auth::user()->priceFormat($weeklyInvoice['invoicePaid'])}}</h4>
+                                                            <h4 class="text-muted">----</h4>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -689,7 +509,7 @@
                                                             <p class="text-muted text-sm mb-0">{{__('Due')}}</p>
                                                         </td>
                                                         <td>
-                                                            <h4 class="text-muted">{{\Auth::user()->priceFormat($weeklyInvoice['invoiceDue'])}}</h4>
+                                                            <h4 class="text-muted">----</h4>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -707,7 +527,7 @@
 
                                                         </td>
                                                         <td>
-                                                            <h4 class="text-muted">{{\Auth::user()->priceFormat($monthlyInvoice['invoiceTotal'])}}</h4>
+                                                            <h4 class="text-muted">-----</h4>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -716,7 +536,7 @@
                                                             <p class="text-muted text-sm mb-0">{{__('Paid')}}</p>
                                                         </td>
                                                         <td>
-                                                            <h4 class="text-muted">{{\Auth::user()->priceFormat($monthlyInvoice['invoicePaid'])}}</h4>
+                                                            <h4 class="text-muted">---</h4>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -725,7 +545,7 @@
                                                             <p class="text-muted text-sm mb-0">{{__('Due')}}</p>
                                                         </td>
                                                         <td>
-                                                            <h4 class="text-muted">{{\Auth::user()->priceFormat($monthlyInvoice['invoiceDue'])}}</h4>
+                                                            <h4 class="text-muted">----</h4>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -761,7 +581,7 @@
 
                                                         </td>
                                                         <td>
-                                                            <h4 class="text-muted">{{\Auth::user()->priceFormat($weeklyBill['billTotal'])}}</h4>
+                                                            <h4 class="text-muted">7000</h4>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -770,7 +590,7 @@
                                                             <p class="text-muted text-sm mb-0">{{__('Paid')}}</p>
                                                         </td>
                                                         <td>
-                                                            <h4 class="text-muted">{{\Auth::user()->priceFormat($weeklyBill['billPaid'])}}</h4>
+                                                            <h4 class="text-muted">500</h4>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -779,7 +599,7 @@
                                                             <p class="text-muted text-sm mb-0">{{__('Due')}}</p>
                                                         </td>
                                                         <td>
-                                                            <h4 class="text-muted">{{\Auth::user()->priceFormat($weeklyBill['billDue'])}}</h4>
+                                                            <h4 class="text-muted">66</h4>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -797,7 +617,7 @@
 
                                                         </td>
                                                         <td>
-                                                            <h4 class="text-muted">{{\Auth::user()->priceFormat($monthlyBill['billTotal'])}}</h4>
+                                                            <h4 class="text-muted">10000</h4>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -806,7 +626,7 @@
                                                             <p class="text-muted text-sm mb-0">{{__('Paid')}}</p>
                                                         </td>
                                                         <td>
-                                                            <h4 class="text-muted">{{\Auth::user()->priceFormat($monthlyBill['billPaid'])}}</h4>
+                                                            <h4 class="text-muted">50000</h4>
                                                         </td>
                                                     </tr>
                                                     <tr>
@@ -815,7 +635,7 @@
                                                             <p class="text-muted text-sm mb-0">{{__('Due')}}</p>
                                                         </td>
                                                         <td>
-                                                            <h4 class="text-muted">{{\Auth::user()->priceFormat($monthlyBill['billDue'])}}</h4>
+                                                            <h4 class="text-muted">400</h4>
                                                         </td>
                                                     </tr>
                                                     </tbody>
@@ -835,12 +655,12 @@
                             <h5>{{__('Goal')}}</h5>
                         </div>
                         <div class="card-body">
-                            @forelse($goals as $goal)
+                            {{-- @forelse($goals as $goal)
                                 @php
                                     $total= $goal->target($goal->type,$goal->from,$goal->to,$goal->amount)['total'];
                                     $percentage=$goal->target($goal->type,$goal->from,$goal->to,$goal->amount)['percentage'];
                                     $per=number_format($goal->target($goal->type,$goal->from,$goal->to,$goal->amount)['percentage'], Utility::getValByName('decimal_number'), '.', '');
-                                @endphp
+                                @endphp --}}
                                 <div class="card border-success border-2 border-bottom-0 border-start-0 border-end-0">
                                     <div class="card-body">
                                         <div class="form-check">
@@ -849,31 +669,31 @@
                                                     <span class="row align-items-center">
                                                         <span class="col">
                                                             <span class="text-muted text-sm">{{__('Name')}}</span>
-                                                            <h6 class="text-nowrap mb-3 mb-sm-0">{{$goal->name}}</h6>
+                                                            <h6 class="text-nowrap mb-3 mb-sm-0">GoalName</h6>
                                                         </span>
                                                         <span class="col">
                                                             <span class="text-muted text-sm">{{__('Type')}}</span>
-                                                            <h6 class="mb-3 mb-sm-0">{{ __(\App\Models\Goal::$goalType[$goal->type]) }}</h6>
+                                                            <h6 class="mb-3 mb-sm-0">Reach 1 billion</h6>
                                                         </span>
                                                         <span class="col">
                                                             <span class="text-muted text-sm">{{__('Duration')}}</span>
-                                                            <h6 class="mb-3 mb-sm-0">{{$goal->from .' To '.$goal->to}}</h6>
+                                                            <h6 class="mb-3 mb-sm-0">duration</h6>
                                                         </span>
                                                         <span class="col">
                                                             <span class="text-muted text-sm">{{__('Target')}}</span>
-                                                            <h6 class="mb-3 mb-sm-0">{{\Auth::user()->priceFormat($total).' of '. \Auth::user()->priceFormat($goal->amount)}}</h6>
+                                                            <h6 class="mb-3 mb-sm-0">---</h6>
                                                         </span>
                                                         <span class="col">
                                                             <span class="text-muted text-sm">{{__('Progress')}}</span>
-                                                            <h6 class="mb-2 d-block">{{number_format($goal->target($goal->type,$goal->from,$goal->to,$goal->amount)['percentage'], Utility::getValByName('decimal_number'), '.', '')}}%</h6>
+                                                            <h6 class="mb-2 d-block">----</h6>
                                                             <div class="progress mb-0">
-                                                                @if($per<=33)
+                                                                {{-- @if($per<=33)
                                                                     <div class="progress-bar bg-danger" style="width: {{$per}}%"></div>
                                                                 @elseif($per>=33 && $per<=66)
                                                                     <div class="progress-bar bg-warning" style="width: {{$per}}%"></div>
                                                                 @else
                                                                     <div class="progress-bar bg-primary" style="width: {{$per}}%"></div>
-                                                                @endif
+                                                                @endif --}}
                                                             </div>
                                                         </span>
                                                     </span>
@@ -882,13 +702,13 @@
                                         </div>
                                     </div>
                                 </div>
-                                @empty
+                                {{-- @empty --}}
                                 <div class="card pb-0">
                                     <div class="card-body text-center">
                                         <h6>{{__('There is no goal.')}}</h6>
                                     </div>
                                 </div>
-                            @endforelse
+                            {{-- @endforelse --}}
                         </div>
                     </div>
                 </div>

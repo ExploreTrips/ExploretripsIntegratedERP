@@ -25,6 +25,8 @@ require __DIR__ . '/auth.php';
 
 Route::get('/account-dashboard', [DashboardController::class, 'account_dashboard_index'])->name('dashboard')->middleware('auth');
 Route::get('dashboard', [DashboardController::class, 'clientView'])->name('client.dashboard.view')->middleware('auth');
+Route::get('/hrm-dashboard', [DashboardController::class, 'hrm_dashboard_index'])->name('hrm.dashboard')->middleware(['auth', 'revalidate']);
+
 
 // cache
 Route::get('/config-cache', function () {
