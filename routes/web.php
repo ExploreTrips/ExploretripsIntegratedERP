@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Dashboard\DashboardController;
 
 
@@ -27,6 +29,18 @@ Route::get('/account-dashboard', [DashboardController::class, 'account_dashboard
 Route::get('dashboard', [DashboardController::class, 'clientView'])->name('client.dashboard.view')->middleware('auth');
 Route::get('/hrm-dashboard', [DashboardController::class, 'hrm_dashboard_index'])->name('hrm.dashboard')->middleware(['auth', 'revalidate']);
 
+// Superadmin Routes
+// Language Routes
+Route::group([
+    'middleware' => [
+        'auth',
+        'crosssite'
+    ],
+],function(){
+    Route::get('change-language/{lang}', [LanguageController::class, 'changeLanguage'])->name('change.language');
+    Route::resource('users', UserController::class);
+
+});
 
 // cache
 Route::get('/config-cache', function () {
