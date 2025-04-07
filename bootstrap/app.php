@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CrossSite;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,8 +20,18 @@ return Application::configure(basePath: dirname(__DIR__))
             'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
             'revalidate' => \App\Http\Middleware\RevalidateBackHistory::class,
             'pusher' => \App\Http\Middleware\pusherConfig::class,
+            // 'XSS' => \App\Http\Middleware\XSS::class,
+            'crosssite' => CrossSite::class
+
+
+        ]);
+
+        $middleware->appendToGroup('web', [
+            \App\Http\Middleware\EncryptCookies::class,
+            \App\Http\Middleware\FilterRequest::class,
         ]);
     })
+
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

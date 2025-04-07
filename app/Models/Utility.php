@@ -517,8 +517,6 @@ class Utility extends Model
     {
         if (self::$languageSetting == null) {
             $languages = Utility::langList();
-
-
             if (\Schema::hasTable('languages')) {
                 $settings = Utility::settings();
                 if (!empty($settings['disable_lang'])) {
@@ -529,6 +527,10 @@ class Utility extends Model
                 }
                 self::$languageSetting = $languages;
             }
+
+
+                self::$languageSetting = $languages;
+
         }
 
         return self::$languageSetting;

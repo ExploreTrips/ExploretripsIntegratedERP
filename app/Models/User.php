@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Plan;
 use App\Models\User;
 use App\Models\EmailTemplate;
 use App\Models\UserEmailTemplate;
@@ -23,6 +24,8 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @var list<string>
      */
+    protected $appends = ['profile'];
+
     protected $fillable = [
         'name',
         'email',
@@ -2916,15 +2919,40 @@ class User extends Authenticatable implements MustVerifyEmail
 }
 
 
-public function show_dashboard()
-{
-    $user_type = \Auth::user()->type;
-    if ($user_type == 'company' || $user_type == 'super admin') {
-        $user = Auth::user();
-    } else {
-        $user = User::where('id', \Auth::user()->created_by)->first();
+    public function show_dashboard()
+    {
+        $user_type = \Auth::user()->type;
+        if ($user_type == 'company' || $user_type == 'super admin') {
+            $user = Auth::user();
+        } else {
+            $user = User::where('id', \Auth::user()->created_by)->first();
+        }
+        return $user->plan;
     }
-    return $user->plan;
-}
+
+    public function currentPlan()
+    {
+        return $this->hasOne(Plan::class, 'id', 'plan');
+    }
+
+
+    public function totalCompanyUsers($id)
+    {
+        return User::where('created_by', '=', $id)->count();
+    }
+
+    public function totalCompanyCustomers($id)
+    {
+        return Customer::where('created_by', '=', $id)->count();
+    }
+
+    public function totalCompanyVenders($id)
+    {
+        return Vender::where('created_by', '=', $id)->count();
+    }
+
+
+
+
 
 }

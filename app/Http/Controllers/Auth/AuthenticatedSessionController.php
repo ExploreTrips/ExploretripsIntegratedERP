@@ -336,14 +336,10 @@ class AuthenticatedSessionController extends Controller
         {
             $lang = Utility::getValByName('default_language');
         }
-
         $langList = Utility::languages()->toArray();
         $lang = array_key_exists($lang, $langList) ? $lang : 'en';
-
         \App::setLocale($lang);
-
         $settings = Utility::settings();
-
         return view('auth.login', compact('lang','settings'));
     }
 

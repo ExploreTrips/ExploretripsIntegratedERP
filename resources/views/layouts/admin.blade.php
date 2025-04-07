@@ -81,6 +81,8 @@
     <link rel="stylesheet" href="{{ asset('assets/css/plugins/flatpickr.min.css') }}">
 
     <link rel="stylesheet" href="{{ asset('assets/css/plugins/animate.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
 
     <!-- font css -->
     <link rel="stylesheet" href="{{ asset('assets/fonts/tabler-icons.min.css') }}">
