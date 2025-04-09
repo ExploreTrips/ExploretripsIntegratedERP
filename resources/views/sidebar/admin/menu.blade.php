@@ -68,7 +68,7 @@
                                 Request::segment(1) == 'reports-pos-vs-purchase'
                                     ? 'active dash-trigger'
                                     : '' }}">
-                        <a href="#!" class="dash-link ">
+                        <a href="{{route('client.dashboard.view')}}" class="dash-link ">
                             <span class="dash-micon">
                                 <i class="ti ti-home"></i>
                             </span>
@@ -1524,7 +1524,7 @@
             <ul class="dash-navbar">
                 @if (Gate::check('manage super admin dashboard'))
                     <li class="dash-item dash-hasmenu {{ Request::segment(1) == 'dashboard' ? ' active' : '' }}">
-                        <a href="#" class="dash-link">
+                        <a href="{{route('client.dashboard.view')}}" class="dash-link">
                             <span class="dash-micon"><i class="ti ti-home"></i></span><span
                                 class="dash-mtext">{{ __('Dashboard') }}</span>
                         </a>

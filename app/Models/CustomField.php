@@ -33,4 +33,14 @@ class CustomField extends Model
         'account' => 'Account',
     ];
 
+    public static function getData($obj, $module)
+    {
+        return \DB::table('custom_field_values')->select(
+            [
+                'custom_field_values.value',
+                'custom_fields.id',
+            ]
+        )->join('custom_fields', 'custom_field_values.field_id', '=', 'custom_fields.id')->where('custom_fields.module', '=', $module)->where('record_id', '=', $obj->id)->get()->pluck('value', 'id');
+    }
+
 }
