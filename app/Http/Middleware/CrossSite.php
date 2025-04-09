@@ -42,7 +42,7 @@ class CrossSite
                         $companyUser->userDefaultDataRegister($companyUser->id);
                     }
 
-                    return redirect()->route('LaravelUpdater::welcome');
+                    // return redirect()->route('LaravelUpdater::welcome');
                 }
             }
         }

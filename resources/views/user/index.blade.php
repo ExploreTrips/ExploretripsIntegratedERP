@@ -2,6 +2,8 @@
 @php
     // $profile=asset(Storage::url('uploads/avatar/'));
     $profile = \App\Models\Utility::get_file('uploads/avatar');
+    $user = auth()->user();
+    // print_r($user);die;
 @endphp
 @section('page-title')
     @if (\Auth::user()->type == 'super admin')
@@ -32,10 +34,15 @@
         @endif
         @can('create user')
             <a href="#" data-size="lg" data-url="{{ route('users.create') }}" data-ajax-popup="true"
-                data-bs-toggle="tooltip"
-                data-title="{{ \Auth::user()->type == 'super admin' ? __('Create Company') : __('Create User') }}"
-                class="btn btn-sm btn-primary me-1">
-                <i class="ti ti-plus"></i>
+                data-bs-toggle="tooltip" class="btn btn-sm btn-primary px-3 py-2 d-inline-flex align-items-center gap-2">
+
+                @if (auth()->user()->type == 'super admin')
+                    <i class="ti ti-building"></i>
+                    {{ __('Create Company') }}
+                @else
+                    <i class="ti ti-user-plus"></i>
+                    {{ __('Create User') }}
+                @endif
             </a>
         @endcan
     </div>
@@ -87,7 +94,7 @@
                                                             id="delete-form-{{ $user->id }}">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" onclick="return confirm('Are you sure?')"
+                                                            <button type="submit"
                                                                 class="dropdown-item bs-pass-para">
                                                                 <i class="ti ti-archive"></i>
                                                                 <span>
@@ -147,7 +154,7 @@
                                     {{-- <img src="{{ !empty($user->avatar) ? Utility::get_file($user->avatar) : asset(Storage::url('uploads/avatar/avatar.png')) }}"
                                         class="" width="120px" height="120px" alt="user-image"> --}}
                                     <img src="{{ asset('assets/images/user/avatar-2.jpg') }}" width="100px" height="100px"
-                                        alt="{{$user->name}}">
+                                        alt="{{ $user->name }}">
                                 </div>
                                 <h4 class=" mt-3 text-primary">{{ $user->name }}</h4>
                                 @if ($user->delete_status == 0)
@@ -177,17 +184,17 @@
 
                                             <!-- Uncomment to show AdminHub button -->
                                             <!--
-                                            <div class="col-12 text-center mb-3">
-                                                <a href="#"
-                                                   data-url="#"
-                                                   data-size="lg"
-                                                   data-ajax-popup="true"
-                                                   class="btn btn-outline-secondary px-4 py-2 rounded-pill"
-                                                   data-title="{{ __('Company Info') }}">
-                                                    {{-- {{ __('AdminHub') }} --}}
-                                                </a>
-                                            </div>
-                                            -->
+                                                <div class="col-12 text-center mb-3">
+                                                    <a href="#"
+                                                       data-url="#"
+                                                       data-size="lg"
+                                                       data-ajax-popup="true"
+                                                       class="btn btn-outline-secondary px-4 py-2 rounded-pill"
+                                                       data-title="{{ __('Company Info') }}">
+                                                        {{-- {{ __('AdminHub') }} --}}
+                                                    </a>
+                                                </div>
+                                                -->
 
                                             <div class="col-12">
                                                 <hr class=" border-secondary">

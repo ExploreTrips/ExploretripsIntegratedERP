@@ -375,36 +375,55 @@ function summernote() {
 
 }
 
-
-
-$(document).on("click", '.bs-pass-para', function () {
+$(document).on("click", '.bs-pass-para', function (e) {
+    e.preventDefault();
     var form = $(this).closest("form");
+
     const swalWithBootstrapButtons = Swal.mixin({
         customClass: {
             confirmButton: 'btn btn-success',
             cancelButton: 'btn btn-danger'
         },
         buttonsStyling: false
-    })
+    });
+
     swalWithBootstrapButtons.fire({
         title: 'Are you sure?',
         text: "This action can not be undone. Do you want to continue?",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes',
-        cancelButtonText: 'No',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, keep it',
         reverseButtons: true
     }).then((result) => {
         if (result.isConfirmed) {
+            // Show deleted alert
+            Swal.fire({
+                icon: 'success',
+                title: 'Deleted!',
+                text: 'The user has been deleted successfully.',
+                showConfirmButton: false,
+                timer: 1500
+            });
 
-            form.submit();
+            // Submit the form after a short delay
+            setTimeout(() => {
+                form.submit();
+            }, 1600);
 
-        } else if (
-            result.dismiss === Swal.DismissReason.cancel
-        ) {
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+            // Show safe alert
+            Swal.fire({
+                icon: 'info',
+                title: 'Cancelled',
+                text: 'The user is safe :)',
+                showConfirmButton: false,
+                timer: 1500
+            });
         }
-    })
+    });
 });
+
 
 //only pos system delete button
 $(document).on("click", '.bs-pass-para-pos', function () {
