@@ -80,14 +80,15 @@
                                                 <div class="dropdown-menu dropdown-menu-end">
 
                                                     @can('edit user')
-                                                        <a href="#!" data-size="lg"
-                                                            data-url="{{ route('users.edit', $user->id) }}"
-                                                            data-ajax-popup="true" class="dropdown-item"
-                                                            data-bs-original-title="{{ \Auth::user()->type == 'super admin' ? __('Edit Company') : __('Edit User') }}">
-                                                            <i class="ti ti-pencil"></i>
-                                                            <span>{{ __('Edit') }}</span>
-                                                        </a>
-                                                    @endcan
+                                                    <a href="#!" data-size="lg"
+                                                        data-url="{{ route('users.edit', $user->id) }}"
+                                                        data-ajax-popup="true" class="dropdown-item"
+                                                        data-bs-original-title="{{ auth()->user()->type == 'super admin' ? __('Edit Company') : __('Edit User') }}">
+                                                        <i class="ti ti-pencil"></i>
+                                                        <span>{{ auth()->user()->type == 'super admin' ? __('Edit Company') : __('Edit User') }}</span>
+                                                    </a>
+                                                @endcan
+
 
                                                     @can('delete user')
                                                         <form method="POST" action="{{ route('users.destroy', $user->id) }}"
@@ -105,14 +106,14 @@
                                                     @endcan
 
                                                     @if (Auth::user()->type == 'super admin')
-                                                        <a href="#" class="dropdown-item"
+                                                        <a href="{{ route('login.with.company', $user->id) }}" class="dropdown-item"
                                                             data-bs-original-title="{{ __('Login As Company') }}">
                                                             <i class="ti ti-replace"></i>
                                                             <span> {{ __('Login As Company') }}</span>
                                                         </a>
                                                     @endif
 
-                                                    <a href="#!" data-url="#" data-ajax-popup="true" data-size="md"
+                                                    <a href="#!" data-url="{{ route('users.reset',$user->id) }}" data-ajax-popup="true" data-size="md"
                                                         class="dropdown-item"
                                                         data-bs-original-title="{{ __('Reset Password') }}">
                                                         <i class="ti ti-adjustments"></i>
@@ -134,7 +135,7 @@
                                                             <span class="text-success"> {{ __('Login Enable') }}</span>
                                                         </a>
                                                     @else
-                                                        <a href="#" class="dropdown-item">
+                                                        <a href="{{route('users.login',$user->id)}}" class="dropdown-item">
                                                             <i class="ti ti-road-sign"></i>
                                                             <span class="text-success"> {{ __('Login Enable') }}</span>
                                                         </a>

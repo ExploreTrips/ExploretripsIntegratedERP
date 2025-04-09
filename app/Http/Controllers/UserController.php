@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
 use Hash;
+use Crypt;
 use Validator;
 use App\Models\Plan;
 use App\Models\User;
@@ -11,6 +13,7 @@ use App\Models\CustomField;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use Lab404\Impersonate\Impersonate;
 
 class UserController extends Controller
 {
@@ -56,7 +59,6 @@ class UserController extends Controller
                 );
                 if ($validator->fails()) {
                     $messages = $validator->getMessageBag();
-
                     return redirect()->back()->with('error', $messages->first());
                 }
                 $enableLogin = 0;
@@ -71,11 +73,9 @@ class UserController extends Controller
                 }
                 $userpassword = $request->input('password');
                 $settings = Utility::settings();
-
                 do {
                     $code = rand(100000, 999999);
                 } while (User::where('referral_code', $code)->exists());
-
                 $user = new User();
                 $user['name'] = $request->name;
                 $user['email'] = $request->email;
@@ -145,17 +145,14 @@ class UserController extends Controller
             // Send Email
             $setings = Utility::settings();
             if ($setings['new_user'] == 1) {
-
                 $user->password = $psw;
                 $user->type = $role_r->name;
                 $user->userDefaultDataRegister($user->id);
-
                 $userArr = [
                     'email' => $user->email,
                     'password' => $user->password,
                 ];
                 $resp = Utility::sendEmailTemplate('new_user', [$user->id => $user->email], $userArr);
-
                 if (\Auth::user()->type == 'super admin') {
                     return redirect()->route('users.index')->with('success', __('Company successfully created.') . ((!empty($resp) && $resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
                 } else {
@@ -172,7 +169,111 @@ class UserController extends Controller
         }
     }
 
-     public function destroy($id)
+    public function edit($id)
+    {
+        $authUser = \Auth::user();
+        if (!$authUser->can('edit user')) {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+        $user = User::findOrFail($id);
+        $roles = Role::where('created_by', $authUser->creatorId())
+                     ->where('name', '!=', 'client')
+                     ->pluck('name', 'id');
+        $user->customField = CustomField::getData($user, 'user');
+        $customFields = CustomField::where('created_by', $authUser->creatorId())
+                                   ->where('module', 'user')
+                                   ->get();
+        return view('user.edit', compact('user', 'roles', 'customFields'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        if (!\Auth::user()->can('edit user')) {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+        $user = User::findOrFail($id);
+        $validationRules = [
+            'name' => 'required|max:120',
+            'email' => 'required|email|unique:users,email,' . $id,
+        ];
+        if (\Auth::user()->type !== 'super admin') {
+            $validationRules['role'] = 'required';
+        }
+        $validator = \Validator::make($request->all(), $validationRules);
+        if ($validator->fails()) {
+            return redirect()->back()->with('error', $validator->getMessageBag()->first());
+        }
+        $input = $request->all();
+        if (\Auth::user()->type === 'super admin') {
+            $role = Role::where('name', 'company')->first();
+        } else {
+            $role = Role::findOrFail($request->role);
+        }
+        $input['type'] = $role->name;
+        $user->fill($input)->save();
+        $user->roles()->sync([$role->id]);
+        if ($request->has('customField')) {
+            CustomField::saveData($user, $request->customField);
+        }
+        if (\Auth::user()->type !== 'super admin') {
+            Utility::employeeDetailsUpdate($user->id, \Auth::user()->creatorId());
+        }
+        $message = Auth::user()->type === 'super admin'? __('Company successfully updated.'): __('User successfully updated.');
+        return redirect()->route('users.index')->with('success', $message);
+    }
+
+    public function LoginWithCompany(Request $request,$id)
+    {
+        $user = User::findOrFail($id);
+            if ($user && auth()->check()) {
+                if ($user->is_enable_login != 1) {
+                    return redirect()->back()->with('error', 'This company login is currently disabled.');
+                }
+            Impersonate::take($request->user(), $user);
+            return redirect('/account-dashboard')->with('success', 'You are now logged in as the selected company.');
+
+        }
+        return redirect()->back()->with('error', 'Unable to impersonate the user.');
+    }
+
+    public function ExitCompany(Request $request)
+    {
+        auth()->user()->leaveImpersonation($request->user());
+        return redirect('/dashboard');
+            return redirect('/dashboard')->with('success', 'Impersonation ended successfully.');
+            // return redirect()->back()->with('error', 'No impersonation session found.');
+    }
+
+    public function userPassword($id)
+    {
+        // $eId = Crypt::decrypt($id);
+        $user = User::findOrFail($id);
+        return view('user.reset', compact('user'));
+    }
+
+    public function userPasswordReset(Request $request, $id)
+    {
+        $validator = \Validator::make($request->all(), [
+            'password' => 'required|confirmed|min:6',
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        $user = User::findOrFail($id);
+        $user->forceFill([
+            'password' => \Hash::make($request->password),
+            'is_enable_login' => 1,
+        ])->save();
+
+        // print_r($user);die;
+        $message = \Auth::user()->type == 'super admin'
+            ? 'Company Password successfully updated.'
+            : 'User Password successfully updated.';
+
+        return redirect()->route('users.index')->with('success', $message);
+    }
+
+    public function destroy($id)
     {
         if (auth()->user()->can('delete user')) {
             if ($id == 2) {
@@ -207,6 +308,37 @@ class UserController extends Controller
             }
         } else {
             return redirect()->back();
+        }
+    }
+
+    public function LoginManage($id)
+    {
+        // $eId = \Crypt::decrypt($id);
+        $user = User::find($id);
+        $authUser = \Auth::user();
+
+        if ($user->is_enable_login == 1) {
+            $user->is_enable_login = 0;
+            $user->save();
+            if($authUser->type == 'super admin')
+            {
+                return redirect()->back()->with('success', __('Company login disable successfully.'));
+            }
+            else
+            {
+                return redirect()->back()->with('success', __('User login disable successfully.'));
+            }
+        } else {
+            $user->is_enable_login = 1;
+            $user->save();
+            if($authUser->type == 'super admin')
+            {
+                return redirect()->back()->with('success', __('Company login enable successfully.'));
+            }
+            else
+            {
+                return redirect()->back()->with('success', __('User login enable successfully.'));
+            }
         }
     }
 }

@@ -66,10 +66,10 @@
         </div>
         <div class="ms-auto">
             <ul class="list-unstyled">
-                @if(\Auth::user()->type == 'company' )
+                @if(auth()->user()->type == 'company' )
                 @impersonating($guard = null)
                 <li class="dropdown dash-h-item drp-company">
-                    <a class="btn btn-danger btn-sm me-3" href="#"><i class="ti ti-ban"></i>
+                    <a class="btn btn-danger btn-sm me-3" href="{{route('exit.company')}}"><i class="ti ti-ban"></i>
                         {{ __('Exit Company Login') }}
                     </a>
                 </li>
@@ -81,7 +81,7 @@
                         <a class="dash-head-link arrow-none me-0" href="{{ url('chats') }}" aria-haspopup="false"
                            aria-expanded="false">
                             <i class="ti ti-brand-hipchat"></i>
-                            <span class="bg-danger dash-h-badge message-toggle-msg  message-counter custom_messanger_counter beep"> {{ $unseenCounter }}<span
+                            <span class="bg-danger dash-h-badge message-toggle-msg  message-counter custom_messanger_counter beep">0<span
                                     class="sr-only"></span>
                             </span>
                         </a>
