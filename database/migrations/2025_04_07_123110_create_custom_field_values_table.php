@@ -11,18 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('table', function (Blueprint $table) {
+        Schema::create('custom_field_values', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('record_id');
             $table->unsignedBigInteger('field_id');
             $table->string('value')->nullable();
             $table->timestamps();
-            $table->unique(
-                [
-                    'record_id',
-                    'field_id',
-                ]
-            );
+            $table->unique(['record_id','field_id',]);
             $table->foreign('field_id')->references('id')->on('custom_fields')->onDelete('cascade');
         });
     }

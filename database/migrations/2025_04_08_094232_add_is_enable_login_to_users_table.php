@@ -11,13 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('custom_fields', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('name');
-            $table->string('type');
-            $table->string('module');
-            $table->integer('created_by');
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->boolean('is_enable_login')->default(0)->after('email_verified_at');
         });
     }
 
@@ -26,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('table');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('is_enable_login');
+        });
     }
 };

@@ -3004,11 +3004,9 @@ class Utility extends Model
     public static function employeeNumber($user_id)
     {
         $latest = Employee::where('created_by', $user_id)->latest()->first();
-
         if (!$latest) {
             return 1;
         }
-
         return $latest->employee_id + 1;
     }
 
