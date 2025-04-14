@@ -4318,7 +4318,7 @@ class Utility extends Model
 
                     $name = $name;
 
-                    if ($settings['storage_setting'] == 'local') {
+                    if ($settings['storage_setting'] == 'public') {
 
                         \Storage::disk()->putFileAs(
                             $path,

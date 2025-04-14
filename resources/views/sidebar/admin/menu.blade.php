@@ -2,14 +2,11 @@
     use App\Models\Utility;
     $setting = \App\Models\Utility::settings();
     $logo = \App\Models\Utility::get_file('uploads/logo');
-
     $company_logo = $setting['company_logo_dark'] ?? '';
     $company_logos = $setting['company_logo_light'] ?? '';
     $company_small_logo = $setting['company_small_logo'] ?? '';
-
     $emailTemplate = \App\Models\EmailTemplate::emailTemplateData();
     $lang = Auth::user()->lang;
-
     $userPlan = \App\Models\Plan::getPlan(\Auth::user()->show_dashboard());
 @endphp
 
@@ -21,19 +18,13 @@
 <div class="navbar-wrapper bg-transparent bg-gradient">
     <div class="m-header main-logo">
         <a href="#" class="b-brand">
-    {{-- <img src="{{ asset(Storage::url('uploads/logo/'.$logo)) }}" alt="{{ env('APP_NAME') }}" class="logo logo-lg" /> --}}
-
-
-        <img class="logo" src="{{ asset('assets/images/ExploreTrips.webp') }}" alt="ExploreTrips" loading="lazy"/>
-
-
-            {{-- @if ($setting['cust_darklayout'] && $setting['cust_darklayout'] == 'on')
+            @if ($setting['cust_darklayout'] && $setting['cust_darklayout'] == 'on')
                 <img src="{{ $logo . '/' . (isset($company_logos) && !empty($company_logos) ? $company_logos : 'logo-dark.png') }}"
                     alt="{{ config('app.name') }}" class="logo logo-lg">
             @else
                 <img src="{{ $logo . '/' . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-light.png') }}"
                     alt="{{ config('app.name') }}" class="logo logo-lg">
-            @endif --}}
+            @endif
 
         </a>
     </div>

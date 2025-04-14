@@ -35,12 +35,8 @@
 <meta name="csrf-token" id="csrf-token" content="{{ csrf_token() }}">
 
 <head>
-    {{-- <title>{{ $setting['title_text'] ? $setting['title_text'] : config('app.name') }} - @yield('page-title')
-    </title> --}}
-
-    <title>{{ config('app.name') }} - @yield('page-title')
+    <title>{{ $setting['title_text'] ? $setting['title_text'] : config('app.name') }} - @yield('page-title')
     </title>
-
     <meta name="title" content="{{ $metatitle }}">
     <meta name="description" content="{{ $metsdesc }}">
 
@@ -68,12 +64,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="url" content="{{ url('') . '/' . config('chatify.path') }}" data-user="{{ Auth::user()->id }}">
-    {{-- <link rel="icon"
+    <link rel="icon"
         href="{{ $logo . '/' . (isset($company_favicon) && !empty($company_favicon) ? $company_favicon : 'favicon.png') }}"
-        type="image" sizes="16x16"> --}}
+        type="image" sizes="16x16">
 
     <!-- Favicon icon -->
-       <link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon"/>
+       {{-- <link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon"/> --}}
     <!-- Calendar-->
     <link rel="stylesheet" href="{{ asset('assets/css/plugins/main.css') }}">
 
@@ -140,7 +136,7 @@
 
 
 
-<body class="bg-transparent">
+<body class="{{$themeColor}}">
 
     <!-- [ Pre-loader ] start -->
     <div class="loader-bg">

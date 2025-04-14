@@ -47,20 +47,15 @@
     dir="{{ $SITE_RTL == 'on' ? 'rtl' : '' }}">
 
 <head>
-    {{-- <title>
+    <title>
         {{ Utility::getValByName('title_text') ? Utility::getValByName('title_text') : config('app.name', 'ERPGO') }}
-        - @yield('page-title')</title> --}}
+        - @yield('page-title')</title>
 
-        <title>
+        {{-- <title>
             ExploreTrips - @yield('page-title')
-        </title>
-
-
-    {{-- <meta name="title" content="{{ $metatitle }}"> --}}
-    <meta name="title" content="Exploretrips">
-
-    {{-- <meta name="description" content="{{ $metsdesc }}"> --}}
-    <meta name="description" content="Exploretrips">
+        </title> --}}
+        <meta name="title" content="{{ $metatitle }}">
+        <meta name="description" content="{{ $metsdesc }}">
 
 
     <!-- Open Graph / Facebook -->
@@ -135,8 +130,7 @@
 
 </head>
 
-{{-- <body class="{{ $themeColor }}"> --}}
-<body class="bg-primary">
+<body class="{{ $themeColor }}">
 
     <div class="custom-login">
         <div class="login-bg-img">
@@ -150,21 +144,21 @@
                     <div class="container">
                         <div class="navbar-brand">
 
-                        {{-- <a class="navbar-brand" href="#">
+                        <a class="navbar-brand" href="#">
                             @if ($setting['cust_darklayout'] == 'on')
                                 <img class="logo"
                                     src="{{ $logo . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-light.png') . '?' . time() }}"
-                                    alt="venkatesh" loading="lazy"/>
+                                    alt="ExploretripsLogo" loading="lazy"/>
                             @else
                                 <img class="logo"
                                     src="{{ $logo . (isset($company_logo) && !empty($company_logo) ? $company_logo : 'logo-dark.png') . '?' . time() }}"
-                                    alt="venkatesh" loading="lazy"/>
+                                    alt="ExploretripsLogo" loading="lazy"/>
                             @endif
-                        </a> --}}
-
-                        <a class="navbar-brand" href="#">
-                            <img class="logo" src="{{ asset('assets/images/ExploreTrips.webp') }}" alt="ExploreTrips" loading="lazy"/>
                         </a>
+
+                        {{-- <a class="navbar-brand" href="#">
+                            <img class="logo" src="{{ asset('assets/images/ExploreTrips.webp') }}" alt="ExploreTrips" loading="lazy"/>
+                        </a> --}}
                     </div>
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                             data-bs-target="#navbarlogin">
