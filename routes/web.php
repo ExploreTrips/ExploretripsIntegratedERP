@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\Settings\SettingsContrpller;
 use App\Http\Controllers\Dashboard\DashboardController;
 
 
@@ -37,13 +38,21 @@ Route::group([
         'crosssite'
     ],
 ],function(){
+
+    // LanguageController Routes
     Route::get('change-language/{lang}', [LanguageController::class, 'changeLanguage'])->name('change.language');
+
+    // UserController Routes
     Route::resource('users', UserController::class);
     Route::get('users/{id}/login-with-company', [UserController::class, 'LoginWithCompany'])->name('login.with.company');
     Route::get('login-with-company/exit', [UserController::class, 'ExitCompany'])->name('exit.company');
     Route::any('user-reset-password/{id}', [UserController::class, 'userPassword'])->name('users.reset');
     Route::post('user-reset-password/{id}', [UserController::class, 'userPasswordReset'])->name('user.password.update');
     Route::get('user-login/{id}', [UserController::class, 'LoginManage'])->name('users.login');
+
+    // SystemController Routes
+    Route::resource('systems', SettingsContrpller::class);
+
 
 });
 

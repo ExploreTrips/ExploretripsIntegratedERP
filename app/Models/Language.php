@@ -20,3 +20,4 @@ class Language extends Model
         });
     }
 }
+
