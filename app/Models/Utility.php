@@ -2,23 +2,23 @@
 
 namespace App\Models;
 
-use App\Mail\CommonEmailTemplate;
-use App\Models\TransactionLines;
+use Auth;
 use Carbon\Carbon;
-use Carbon\CarbonPeriod;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Storage;
-use Spatie\GoogleCalendar\Event as GoogleEvent;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
-use Twilio\Rest\Client;
-use App\Models\ReferralTransaction;
-use App\Models\ReferralSetting;
 use App\Models\User;
+use Twilio\Rest\Client;
+use Carbon\CarbonPeriod;
+use App\Models\ReferralSetting;
+use App\Models\TransactionLines;
+use App\Mail\CommonEmailTemplate;
+use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
+use App\Models\ReferralTransaction;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Models\Permission;
+use Spatie\GoogleCalendar\Event as GoogleEvent;
 
 class Utility extends Model
 {
@@ -527,20 +527,14 @@ class Utility extends Model
                 }
                 self::$languageSetting = $languages;
             }
-
-
-                self::$languageSetting = $languages;
-
+            self::$languageSetting = $languages;
         }
-
         return self::$languageSetting;
     }
 
     public static function getValByName($key)
     {
-
         $setting = Utility::settings();
-
         if (!isset($setting[$key]) || empty($setting[$key])) {
             $setting[$key] = '';
         }
@@ -4000,9 +3994,7 @@ class Utility extends Model
         if (\Auth::check()) {
             if (\Auth::user()->type == 'super admin') {
                 $user = \Auth::user();
-
                 $setting = DB::table('settings')->where('created_by', $user->id)->pluck('value', 'name')->toArray();
-
             } else {
                 $setting = DB::table('settings')->where('created_by', \Auth::user()->creatorId())->pluck('value', 'name')->toArray();
             }
@@ -4014,7 +4006,6 @@ class Utility extends Model
         if (!isset($setting['color'])) {
             $setting = Utility::settings();
         }
-
         return $setting;
     }
 
@@ -4385,7 +4376,6 @@ class Utility extends Model
     public static function get_file($path)
     {
         $settings = Utility::getStorageSetting();
-
         try {
             if ($settings['storage_setting'] == 'wasabi') {
                 config(
@@ -4408,7 +4398,6 @@ class Utility extends Model
                     ]
                 );
             }
-
             return \Storage::disk($settings['storage_setting'])->url($path);
         } catch (\Throwable $th) {
             return '';
@@ -4440,7 +4429,6 @@ class Utility extends Model
             "wasabi_root" => "",
             "wasabi_max_upload_size" => "",
             "wasabi_storage_validation" => "",
-
         ];
         foreach ($data as $row) {
             $settings[$row->name] = $row->value;

@@ -121,13 +121,13 @@
                                                     </a>
 
                                                     @if ($user->is_enable_login == 1)
-                                                        <a href="" class="dropdown-item">
+                                                        <a href="{{route('users.login',$user->id)}}" class="dropdown-item">
                                                             <i class="ti ti-road-sign"></i>
                                                             <span class="text-danger"> {{ __('Login Disable') }}</span>
                                                         </a>
                                                     @elseif ($user->is_enable_login == 0 && $user->password == null)
                                                         <a href="#"
-                                                            data-url="{{ route('users.reset', \Crypt::encrypt($user->id)) }}"
+                                                            data-url="{{ route('users.reset', $user->id) }}"
                                                             data-ajax-popup="true" data-size="md"
                                                             class="dropdown-item login_enable"
                                                             data-title="{{ __('New Password') }}" class="dropdown-item">
