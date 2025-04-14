@@ -9,8 +9,8 @@
 
 @php
     $lang = \App\Models\Utility::getValByName('default_language');
-    // $logo=asset(Storage::url('uploads/logo/'));
-    $logo = \App\Models\Utility::get_file('uploads/logo');
+    $logo = asset(Storage::url('uploads/logo/'));
+    // $logo = \App\Models\Utility::get_file('uploads/logo');
 
     // dd($logo);
 
@@ -24,7 +24,7 @@
     $meta_image = \App\Models\Utility::get_file('uploads/meta/');
     $google_recaptcha_version = ['v2-checkbox' => __('v2'), 'v3' => __('v3')];
     $languages = \App\Models\Utility::languages();
-    $footer_text = \App\Models\Utility::getValByName('footer_text')
+    $footer_text = \App\Models\Utility::getValByName('footer_text');
 @endphp
 
 {{-- Storage setting --}}
@@ -43,16 +43,105 @@
 
 @endphp
 <style>
+    .color-wrp {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+    }
 
+    .themes-color {
+        display: grid;
+        grid-template-columns: repeat(5, 40px);
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 1rem;
+    }
 
+    .themes-color-change {
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: all 0.3s ease-in-out;
+    }
+
+    .themes-color-change.active_color {
+        border-color: #000;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Example Theme Colors */
+    .themes-color-change[data-value="theme-1"] {
+        background-color: #4CAF50;
+    }
+
+    .themes-color-change[data-value="theme-2"] {
+        background-color: #2196F3;
+    }
+
+    .themes-color-change[data-value="theme-3"] {
+        background-color: #FF9800;
+    }
+
+    .themes-color-change[data-value="theme-4"] {
+        background-color: #9C27B0;
+    }
+
+    .themes-color-change[data-value="theme-5"] {
+        background-color: #F44336;
+    }
+
+    .themes-color-change[data-value="theme-6"] {
+        background-color: #00BCD4;
+    }
+
+    .themes-color-change[data-value="theme-7"] {
+        background-color: #795548;
+    }
+
+    .themes-color-change[data-value="theme-8"] {
+        background-color: #607D8B;
+    }
+
+    .themes-color-change[data-value="theme-9"] {
+        background-color: #E91E63;
+    }
+
+    .themes-color-change[data-value="theme-10"] {
+        background-color: #3F51B5;
+    }
+
+    .color-picker-wrp {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .colorPicker {
+        width: 50px;
+        height: 50px;
+        border: none;
+        padding: 0;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    .colorPicker.active_color {
+        border: 3px solid #000;
+    }
 </style>
+,
 
 <script>
     // document.addEventListener("DOMContentLoaded", function() {
     //     const body = document.querySelector("body");
     //     const input = document.getElementById("colorPicker");
     //     const colorCode = document.getElementById("colorCode");
-    //     const button = document.getElementById("changeColorButton");
+    //     const button = document.getElementById("
+    // changeColorButton");
 
     //     setColor();
     //     input.addEventListener("input", setColor);
@@ -332,7 +421,7 @@
 
                     $('.dash-sidebar .main-logo a img').attr('src',
                         '{{ isset($logo_light) && !empty($logo_light) ? $logo . $logo_light : $logo . '/logo-light.png' }}'
-                        );
+                    );
 
                 } else {
                     $('#main-style-link').attr('href', '{{ config('app.url') }}' + '/public/assets/css/style.css');
@@ -341,7 +430,7 @@
 
                     $('.dash-sidebar .main-logo a img').attr('src',
                         '{{ isset($logo_light) && !empty($logo_light) ? $logo . $logo_light : $logo . '/logo-dark.png' }}'
-                        );
+                    );
 
                 }
             });
@@ -432,174 +521,176 @@
                         <div class="card-header">
                             <h5>{{ __('Brand Settings') }}</h5>
                         </div>
-                        <form action={{url('systems')}} method='post' enctype='multipart/form-data'>
+                        <form action={{ url('systems') }} method='post' enctype='multipart/form-data'>
                             @csrf
                             <div class="card-body">
-                            <div class="row">
-                                <div class="col-lg-4 col-sm-6 col-md-6">
-                                    <div class="card logo_card">
-                                        <div class="card-header">
-                                            <h5>{{ __('Logo dark') }}</h5>
-                                        </div>
-                                        <div class="card-body pt-0">
-                                            <div class="setting-card">
-                                                <div class="logo-content mt-4">
-                                                    <img id="image"
-                                                        src="{{ $logo . '/' . (isset($logo_dark) && !empty($logo_dark) ? $logo_dark : 'logo-dark.png') . '?timestamp=' . time() }}"
-                                                        class="big-logo">
-                                                </div>
-                                                <div class="choose-files mt-5">
-                                                    <label for="logo_dark">
-                                                        <div class=" bg-primary company_logo_update"> <i
-                                                                class="ti ti-upload px-1"></i>{{ __('Choose file here') }}
-                                                        </div>
-                                                        <input type="file" name="logo_dark" id="logo_dark"
-                                                            class="form-control file" data-filename="logo_dark">
-                                                    </label>
-                                                </div>
-                                                @error('logo_dark')
-                                                    <div class="row">
-                                                        <span class="invalid-logo" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                    </div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4 col-sm-6 col-md-6">
-                                    <div class="card logo_card">
-                                        <div class="card-header">
-                                            <h5>{{ __('Logo Light') }}</h5>
-                                        </div>
-                                        <div class="card-body pt-0">
-                                            <div class=" setting-card">
-                                                <div class="logo-content mt-4">
-                                                    <img id="image"
-     src="{{ asset('storage/uploads/logo/' . ($logo_dark ?? 'logo-dark.png')) . '?t=' . time() }}"
-     class="big-logo">
-
-
-                                                </div>
-
-
-
-                                                <div class="choose-files mt-5">
-                                                    <label for="logo_light">
-                                                        <div class=" bg-primary dark_logo_update"> <i
-                                                                class="ti ti-upload px-1">
-                                                            </i>{{ __('Choose file here') }}
-                                                        </div>
-                                                        <input type="file" name="logo_light" id="logo_light"
-                                                            class="form-control file" data-filename="logo_light">
-                                                    </label>
-                                                </div>
-                                                @error('logo_light')
-                                                    <div class="row">
-                                                        <span class="invalid-logo" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                    </div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-4 col-sm-6 col-md-6">
-                                    <div class="card logo_card">
-                                        <div class="card-header">
-                                            <h5>{{ __('Favicon') }}</h5>
-                                        </div>
-                                        <div class="card-body pt-0">
-                                            <div class=" setting-card">
-                                                <div class="logo-content mt-4">
-                                                    <img id="image1"
-                                                        src="{{ $logo . '/' . (isset($company_favicon) && !empty($company_favicon) ? $company_favicon : 'favicon.png') . '?timestamp=' . time() }}"
-                                                        width="50px" class=" big-logo img_setting">
-                                                </div>
-                                                <div class="choose-files mt-5">
-                                                    <label for="favicon">
-                                                        <div class="bg-primary company_favicon_update"> <i
-                                                                class="ti ti-upload px-1"></i>{{ __('Choose file here') }}
-                                                        </div>
-                                                        <input type="file" class="form-control file" id="favicon"
-                                                            name="favicon" data-filename="favicon">
-                                                    </label>
-                                                </div>
-                                                @error('favicon')
-                                                    <div class="row">
-                                                        <span class="invalid-logo" role="alert">
-                                                            <strong class="text-danger">{{ $message }}</strong>
-                                                        </span>
-                                                    </div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row ">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="title_text" class="form-label">{{ __('Title Text') }}</label>
-                                            <input type="text" name="title_text" id="title_text" class="form-control" placeholder="{{ __('Title Text') }}" value="{{ old('title_text', $settings['title_text'] ?? '') }}">
-
-                                            @error('title_text')
-                                                <span class="invalid-title_text" role="alert">
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                </span>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="footer_text" class="form-label">{{ __('Footer Text') }}</label>
-                                            <input type="text" name="footer_text" id="footer_text" class="form-control"
-                                            placeholder="{{ __('Enter Footer Text') }}"
-                                            value="{{ old('footer_text', $footer_text)}}">
-                                            @error('footer_text')
-                                                <span class="invalid-footer_text" role="alert">
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                </span>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for='default_language' class='form-label' {{__('Default Language')}}>
-                                            <div class="changeLanguage">
-                                                <select name="default_language" id="default_language"
-                                                    class="form-control select">
-                                                    @foreach ($languages as $code => $language)
-                                                        <option
-                                                        @if ($lang == $code) selected
-                                                        @endif
-                                                            value="{{ $code }}">
-                                                            {{ ucFirst($language) }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            @error('default_language')
-                                                <span class="invalid-default_language" role="alert">
-                                                    <strong class="text-danger">{{ $message }}</strong>
-                                                </span>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="row">
-                                    <div class="form-group col-md-2">
-                                        <div class="custom-control custom-switch">
-                                            <label class="mb-1 mt-3" for="SITE_RTL">{{ __('Enable RTL') }}</label>
-                                            <div class="">
-                                                <input type="checkbox" name="SITE_RTL" id="SITE_RTL"
-                                                    data-toggle="switchbutton" data-onstyle="primary"
-                                                    {{ $settings['SITE_RTL'] == 'on' ? 'checked="checked"' : '' }}>
-                                                <label class="custom-control-label" for="SITE_RTL"></label>
+                                    <div class="col-lg-4 col-sm-6 col-md-6">
+                                        <div class="card logo_card">
+                                            <div class="card-header">
+                                                <h5>{{ __('Logo dark') }}</h5>
+                                            </div>
+                                            <div class="card-body pt-0">
+                                                <div class="setting-card">
+                                                    <div class="logo-content mt-4">
+                                                        <img id="image"
+                                                            src="{{ $logo . '/' . (isset($logo_dark) && !empty($logo_dark) ? $logo_dark : 'logo-dark.png') . '?timestamp=' . time() }}"
+                                                            class="big-logo">
+
+                                                        {{-- <img src="{{ asset('storage/uploads/logo/logo-dark.png') }}" alt="Logo" class="big-logo" id="image"> --}}
+
+                                                    </div>
+                                                    <div class="choose-files mt-5">
+                                                        <label for="logo_dark">
+                                                            <div class=" bg-primary company_logo_update"> <i
+                                                                    class="ti ti-upload px-1"></i>{{ __('Choose file here') }}
+                                                            </div>
+                                                            <input type="file" name="logo_dark" id="logo_dark"
+                                                                class="form-control file" data-filename="logo_dark">
+                                                        </label>
+                                                    </div>
+                                                    @error('logo_dark')
+                                                        <div class="row">
+                                                            <span class="invalid-logo" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
+                                                        </div>
+                                                    @enderror
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    {{-- <div class="col-md-3">
+                                    <div class="col-lg-4 col-sm-6 col-md-6">
+                                        <div class="card logo_card">
+                                            <div class="card-header">
+                                                <h5>{{ __('Logo Light') }}</h5>
+                                            </div>
+                                            <div class="card-body pt-0">
+                                                <div class=" setting-card">
+                                                    <div class="logo-content mt-4">
+                                                        <img id="image1"
+                                                            src="{{ $logo . '/' . (isset($logo_light) && !empty($logo_light) ? $logo_light : 'logo-light.png') . '?timestamp=' . time() }}"
+                                                            class="big-logo img_setting">
+
+                                                        {{-- <img src="{{ asset('storage/uploads/logo/logo-light.png') }}" alt="Logo" class="big-logo" id="image1"> --}}
+                                                    </div>
+                                                    <div class="choose-files mt-5">
+                                                        <label for="logo_light">
+                                                            <div class=" bg-primary dark_logo_update"> <i
+                                                                    class="ti ti-upload px-1">
+                                                                </i>{{ __('Choose file here') }}
+                                                            </div>
+                                                            <input type="file" name="logo_light" id="logo_light"
+                                                                class="form-control file" data-filename="logo_light">
+                                                        </label>
+                                                    </div>
+                                                    @error('logo_light')
+                                                        <div class="row">
+                                                            <span class="invalid-logo" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
+                                                        </div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 col-sm-6 col-md-6">
+                                        <div class="card logo_card">
+                                            <div class="card-header">
+                                                <h5>{{ __('Favicon') }}</h5>
+                                            </div>
+                                            <div class="card-body pt-0">
+                                                <div class=" setting-card">
+                                                    <div class="logo-content mt-4">
+                                                        <img id="image2"
+                                                            src="{{ $logo . '/' . (isset($company_favicon) && !empty($company_favicon) ? $company_favicon : 'favicon.png') . '?timestamp=' . time() }}"
+                                                            width="50px" class=" big-logo img_setting">
+                                                    </div>
+                                                    <div class="choose-files mt-5">
+                                                        <label for="favicon">
+                                                            <div class="bg-primary company_favicon_update"> <i
+                                                                    class="ti ti-upload px-1"></i>{{ __('Choose file here') }}
+                                                            </div>
+                                                            <input type="file" class="form-control file"
+                                                                id="favicon" name="favicon" data-filename="favicon">
+                                                        </label>
+                                                    </div>
+                                                    @error('favicon')
+                                                        <div class="row">
+                                                            <span class="invalid-logo" role="alert">
+                                                                <strong class="text-danger">{{ $message }}</strong>
+                                                            </span>
+                                                        </div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row ">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="title_text" class="form-label">{{ __('Title Text') }}</label>
+                                                <input type="text" name="title_text" id="title_text"
+                                                    class="form-control" placeholder="{{ __('Title Text') }}"
+                                                    value="{{ old('title_text', $settings['title_text'] ?? '') }}">
+
+                                                @error('title_text')
+                                                    <span class="invalid-title_text" role="alert">
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for="footer_text"
+                                                    class="form-label">{{ __('Footer Text') }}</label>
+                                                <input type="text" name="footer_text" id="footer_text"
+                                                    class="form-control" placeholder="{{ __('Enter Footer Text') }}"
+                                                    value="{{ old('footer_text', $footer_text) }}">
+                                                @error('footer_text')
+                                                    <span class="invalid-footer_text" role="alert">
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label for='default_language' class='form-label'>
+                                                    {{ __('Default Language') }}</label>
+                                                <div class="changeLanguage">
+                                                    <select name="default_language" id="default_language"
+                                                        class="form-control select">
+                                                        @foreach ($languages as $code => $language)
+                                                            <option @if ($lang == $code) selected @endif
+                                                                value="{{ $code }}">
+                                                                {{ ucFirst($language) }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                @error('default_language')
+                                                    <span class="invalid-default_language" role="alert">
+                                                        <strong class="text-danger">{{ $message }}</strong>
+                                                    </span>
+                                                @enderror
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-2">
+                                            <div class="custom-control custom-switch">
+                                                <label class="mb-1 mt-3" for="SITE_RTL">{{ __('Enable RTL') }}</label>
+                                                <div class="">
+                                                    <input type="checkbox" name="SITE_RTL" id="SITE_RTL"
+                                                        data-toggle="switchbutton" data-onstyle="primary"
+                                                        {{ $settings['SITE_RTL'] == 'on' ? 'checked="checked"' : '' }}>
+                                                    <label class="custom-control-label" for="SITE_RTL"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {{-- <div class="col-md-3">
                                         <div class="form-group">
                                             <label class="mb-1 mt-3"
                                                 for="display_landing_page">{{ __('Enable Landing Page') }}</label>
@@ -614,122 +705,123 @@
                                         </div>
                                     </div> --}}
 
-                                    <div class="col-md-3">
-                                        <div class="form-group">
-                                            <label class="mb-1 mt-3"
-                                                for="signup_button">{{ __('Enable Sign-Up Page') }}</label>
-                                            <div class="">
-                                                <input type="checkbox" name="enable_signup" id="enable_signup"
-                                                    data-toggle="switchbutton"
-                                                    {{ $settings['enable_signup'] == 'on' ? 'checked="checked"' : '' }}
-                                                    data-onstyle="primary">
-                                                <label class="form-check-label" for="enable_signup"></label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-auto">
-                                        <div class="form-group">
-                                            <label class="mb-1 mt-3"
-                                                for="email_verification">{{ __('Email Verification') }}</label>
-                                            <div class="">
-                                                <input type="checkbox" name="email_verification" id="email_verification"
-                                                    data-toggle="switchbutton"
-                                                    {{ $settings['email_verification'] == 'on' ? 'checked="checked"' : '' }}
-                                                    data-onstyle="primary">
-                                                <label class="form-check-label" for="email_verification"></label>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <h4 class="small-title">{{ __('Theme Customizer') }}</h4>
-                                <div class="setting-card setting-logo-box p-3">
-                                    <div class="row">
-                                        <div class="col-lg-4 col-xl-4 col-md-4">
-                                            <h6 class="mt-2">
-                                                <i data-feather="credit-card"
-                                                    class="me-2"></i>{{ __('Primary color settings') }}
-                                            </h6>
-
-                                            <hr class="my-2" />
-                                            <div class="color-wrp">
-                                                <div class="theme-color themes-color">
-                                                    <a href="#!"
-                                                        class="themes-color-change {{ $color == 'theme-1' ? 'active_color' : '' }}"
-                                                        data-value="theme-1"></a>
-                                                    <input type="radio" class="theme_color d-none" name="color"
-                                                        value="theme-1"{{ $color == 'theme-1' ? 'checked' : '' }}>
-                                                    <a href="#!"
-                                                        class="themes-color-change {{ $color == 'theme-2' ? 'active_color' : '' }}"
-                                                        data-value="theme-2"></a>
-                                                    <input type="radio" class="theme_color d-none" name="color"
-                                                        value="theme-2"{{ $color == 'theme-2' ? 'checked' : '' }}>
-                                                    <a href="#!"
-                                                        class="themes-color-change {{ $color == 'theme-3' ? 'active_color' : '' }}"
-                                                        data-value="theme-3"></a>
-                                                    <input type="radio" class="theme_color d-none" name="color"
-                                                        value="theme-3"{{ $color == 'theme-3' ? 'checked' : '' }}>
-                                                    <a href="#!"
-                                                        class="themes-color-change {{ $color == 'theme-4' ? 'active_color' : '' }}"
-                                                        data-value="theme-4"></a>
-                                                    <input type="radio" class="theme_color d-none" name="color"
-                                                        value="theme-4"{{ $color == 'theme-4' ? 'checked' : '' }}>
-                                                    <a href="#!"
-                                                        class="themes-color-change {{ $color == 'theme-5' ? 'active_color' : '' }}"
-                                                        data-value="theme-5"></a>
-                                                    <input type="radio" class="theme_color d-none" name="color"
-                                                        value="theme-5"{{ $color == 'theme-5' ? 'checked' : '' }}>
-                                                    <br>
-                                                    <a href="#!"
-                                                        class="themes-color-change {{ $color == 'theme-6' ? 'active_color' : '' }}"
-                                                        data-value="theme-6"></a>
-                                                    <input type="radio" class="theme_color d-none" name="color"
-                                                        value="theme-6"{{ $color == 'theme-6' ? 'checked' : '' }}>
-                                                    <a href="#!"
-                                                        class="themes-color-change {{ $color == 'theme-7' ? 'active_color' : '' }}"
-                                                        data-value="theme-7"></a>
-                                                    <input type="radio" class="theme_color d-none" name="color"
-                                                        value="theme-7"{{ $color == 'theme-7' ? 'checked' : '' }}>
-                                                    <a href="#!"
-                                                        class="themes-color-change {{ $color == 'theme-8' ? 'active_color' : '' }}"
-                                                        data-value="theme-8"></a>
-                                                    <input type="radio" class="theme_color d-none" name="color"
-                                                        value="theme-8"{{ $color == 'theme-8' ? 'checked' : '' }}>
-                                                    <a href="#!"
-                                                        class="themes-color-change {{ $color == 'theme-9' ? 'active_color' : '' }}"
-                                                        data-value="theme-9"></a>
-                                                    <input type="radio" class="theme_color d-none" name="color"
-                                                        value="theme-9"{{ $color == 'theme-9' ? 'checked' : '' }}>
-                                                    <a href="#!"
-                                                        class="themes-color-change {{ $color == 'theme-10' ? 'active_color' : '' }}"
-                                                        data-value="theme-10"></a>
-                                                    <input type="radio" class="theme_color d-none" name="color"
-                                                        value="theme-10"{{ $color == 'theme-10' ? 'checked' : '' }}>
-                                                </div>
-                                                <div class="color-picker-wrp">
-                                                    <input type="color" value="{{ $color ? $color : '' }}"
-                                                        class="colorPicker {{ isset($flag) && $flag == 'true' ? 'active_color' : '' }}"
-                                                        name="custom_color" id="color-picker">
-                                                    <input type='hidden' name="color_flag"
-                                                        value={{ isset($flag) && $flag == 'true' ? 'true' : 'false' }}>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label class="mb-1 mt-3"
+                                                    for="signup_button">{{ __('Enable Sign-Up Page') }}</label>
+                                                <div class="">
+                                                    <input type="checkbox" name="enable_signup" id="enable_signup"
+                                                        data-toggle="switchbutton"
+                                                        {{ $settings['enable_signup'] == 'on' ? 'checked="checked"' : '' }}
+                                                        data-onstyle="primary">
+                                                    <label class="form-check-label" for="enable_signup"></label>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-4 col-xl-4 col-md-4">
-                                            <h6 class="mt-2">
-                                                <i data-feather="layout" class="me-2"></i>{{ __('Sidebar settings') }}
-                                            </h6>
-                                            <hr class="my-2" />
-                                            <div class="form-check form-switch">
-                                                <input type="checkbox" class="form-check-input" id="cust-theme-bg"
-                                                    name="cust_theme_bg"
-                                                    {{ !empty($settings['cust_theme_bg']) && $settings['cust_theme_bg'] == 'on' ? 'checked' : '' }} />
-                                                <label class="form-check-label f-w-600 pl-1"
-                                                    for="cust-theme-bg">{{ __('Transparent layout') }}</label>
+                                        <div class="col-auto">
+                                            <div class="form-group">
+                                                <label class="mb-1 mt-3"
+                                                    for="email_verification">{{ __('Email Verification') }}</label>
+                                                <div class="">
+                                                    <input type="checkbox" name="email_verification"
+                                                        id="email_verification" data-toggle="switchbutton"
+                                                        {{ $settings['email_verification'] == 'on' ? 'checked="checked"' : '' }}
+                                                        data-onstyle="primary">
+                                                    <label class="form-check-label" for="email_verification"></label>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="col-lg-4 col-xl-4 col-md-4">
+
+                                    </div>
+                                    <hr class="my-2" />
+                                    <h4 class="small-title">{{ __('Theme Customizer') }}</h4>
+                                    <div class="setting-card setting-logo-box p-3">
+                                        <div class="row">
+                                            <div class="col-lg-4 col-xl-4 col-md-4">
+                                                <h6 class="mt-2">
+                                                    <i data-feather="credit-card"
+                                                        class="me-2"></i>{{ __('Primary color settings') }}
+                                                </h6>
+
+                                                <hr class="my-2" />
+                                                <div class="color-wrp">
+                                                    <div class="theme-color themes-color">
+                                                        <a href="#!"
+                                                            class="themes-color-change {{ $color == 'theme-1' ? 'active_color' : '' }}"
+                                                            data-value="theme-1"></a>
+                                                        <input type="radio" class="theme_color d-none" name="color"
+                                                            value="theme-1"{{ $color == 'theme-1' ? 'checked' : '' }}>
+                                                        <a href="#!"
+                                                            class="themes-color-change {{ $color == 'theme-2' ? 'active_color' : '' }}"
+                                                            data-value="theme-2"></a>
+                                                        <input type="radio" class="theme_color d-none" name="color"
+                                                            value="theme-2"{{ $color == 'theme-2' ? 'checked' : '' }}>
+                                                        <a href="#!"
+                                                            class="themes-color-change {{ $color == 'theme-3' ? 'active_color' : '' }}"
+                                                            data-value="theme-3"></a>
+                                                        <input type="radio" class="theme_color d-none" name="color"
+                                                            value="theme-3"{{ $color == 'theme-3' ? 'checked' : '' }}>
+                                                        <a href="#!"
+                                                            class="themes-color-change {{ $color == 'theme-4' ? 'active_color' : '' }}"
+                                                            data-value="theme-4"></a>
+                                                        <input type="radio" class="theme_color d-none" name="color"
+                                                            value="theme-4"{{ $color == 'theme-4' ? 'checked' : '' }}>
+                                                        <a href="#!"
+                                                            class="themes-color-change {{ $color == 'theme-5' ? 'active_color' : '' }}"
+                                                            data-value="theme-5"></a>
+                                                        <input type="radio" class="theme_color d-none" name="color"
+                                                            value="theme-5"{{ $color == 'theme-5' ? 'checked' : '' }}>
+                                                        <br>
+                                                        <a href="#!"
+                                                            class="themes-color-change {{ $color == 'theme-6' ? 'active_color' : '' }}"
+                                                            data-value="theme-6"></a>
+                                                        <input type="radio" class="theme_color d-none" name="color"
+                                                            value="theme-6"{{ $color == 'theme-6' ? 'checked' : '' }}>
+                                                        <a href="#!"
+                                                            class="themes-color-change {{ $color == 'theme-7' ? 'active_color' : '' }}"
+                                                            data-value="theme-7"></a>
+                                                        <input type="radio" class="theme_color d-none" name="color"
+                                                            value="theme-7"{{ $color == 'theme-7' ? 'checked' : '' }}>
+                                                        <a href="#!"
+                                                            class="themes-color-change {{ $color == 'theme-8' ? 'active_color' : '' }}"
+                                                            data-value="theme-8"></a>
+                                                        <input type="radio" class="theme_color d-none" name="color"
+                                                            value="theme-8"{{ $color == 'theme-8' ? 'checked' : '' }}>
+                                                        <a href="#!"
+                                                            class="themes-color-change {{ $color == 'theme-9' ? 'active_color' : '' }}"
+                                                            data-value="theme-9"></a>
+                                                        <input type="radio" class="theme_color d-none" name="color"
+                                                            value="theme-9"{{ $color == 'theme-9' ? 'checked' : '' }}>
+                                                        <a href="#!"
+                                                            class="themes-color-change {{ $color == 'theme-10' ? 'active_color' : '' }}"
+                                                            data-value="theme-10"></a>
+                                                        <input type="radio" class="theme_color d-none" name="color"
+                                                            value="theme-10"{{ $color == 'theme-10' ? 'checked' : '' }}>
+                                                    </div>
+                                                    <div class="color-picker-wrp">
+                                                        <input type="color" value="{{ $color ? $color : '' }}"
+                                                            class="colorPicker {{ isset($flag) && $flag == 'true' ? 'active_color' : '' }}"
+                                                            name="custom_color" id="color-picker">
+                                                        <input type='hidden' name="color_flag"
+                                                            value={{ isset($flag) && $flag == 'true' ? 'true' : 'false' }}>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 col-xl-4 col-md-4">
+                                                <h6 class="mt-2">
+                                                    <i data-feather="layout"
+                                                        class="me-2"></i>{{ __('Sidebar settings') }}
+                                                </h6>
+                                                <hr class="my-2" />
+                                                <div class="form-check form-switch">
+                                                    <input type="checkbox" class="form-check-input" id="cust-theme-bg"
+                                                        name="cust_theme_bg"
+                                                        {{ !empty($settings['cust_theme_bg']) && $settings['cust_theme_bg'] == 'on' ? 'checked' : '' }} />
+                                                    <label class="form-check-label f-w-600 pl-1"
+                                                        for="cust-theme-bg">{{ __('Transparent layout') }}</label>
+                                                </div>
+                                            </div>
+                                            {{-- <div class="col-lg-4 col-xl-4 col-md-4">
                                             <h6 class="mt-2">
                                                 <i data-feather="sun" class="me-2"></i>{{ __('Layout settings') }}
                                             </h6>
@@ -740,176 +832,159 @@
                                                 <label class="form-check-label f-w-600 pl-1"
                                                     for="cust-darklayout">{{ __('Dark Layout') }}</label>
                                             </div>
+                                        </div> --}}
                                         </div>
                                     </div>
-                                </div>
-                                <div class="card-footer text-end">
-                                    <div class="form-group">
-                                        <input class="btn btn-print-invoice btn-primary m-r-10" type="submit"
-                                            value="{{ __('Save Changes') }}">
+                                    <div class="card-footer text-end">
+                                        <div class="form-group">
+                                            <input class="btn btn-print-invoice btn-primary m-r-10" type="submit"
+                                                value="{{ __('Save Changes') }}">
+                                        </div>
                                     </div>
-                                </div>
                         </form>
-                            </div>
-                        </div>
                     </div>
+                </div>
+            </div>
 
-                    <!--Email Settings-->
-                    <div id="email-settings" class="card">
-                        <div class="card-header">
-                            <h5>{{ __('Email Settings') }}</h5>
-                            <small
-                                class="text-muted">{{ __('This SMTP will be used for system-level email sending. Additionally, if a company user does not set their SMTP, then this SMTP will be used for sending emails.') }}</small>
+            <!--Email Settings-->
+            <div id="email-settings" class="card">
+                <div class="card-header">
+                    <h5>{{ __('Email Settings') }}</h5>
+                    <small
+                        class="text-muted">{{ __('This SMTP will be used for system-level email sending. Additionally, if a company user does not set their SMTP, then this SMTP will be used for sending emails.') }}</small>
+                </div>
+                <div class="card-body">
+                    <form action="#" method="post">
+                        @csrf
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="mail_driver" class="form-label">{{ __('Mail Driver') }}</label>
+                                    <input type="text" name="mail_driver" id="mail_driver" class="form-control"
+                                        placeholder="{{ __('Enter Mail Driver') }}"
+                                        value="{{ old('mail_driver', $settings['mail_driver'] ?? '') }}">
+                                    @error('mail_driver')
+                                        <span class="invalid-feedback d-block">
+                                            <strong class="text-danger">{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="mail_host" class="form-label">{{ __('Mail Host') }}</label>
+                                    <input type="text" name="mail_host" id="mail_host" class="form-control"
+                                        placeholder="{{ __('Enter Mail Host') }}"
+                                        value="{{ old('mail_host', $settings['mail_host'] ?? '') }}">
+                                    @error('mail_host')
+                                        <span class="invalid-feedback d-block">
+                                            <strong class="text-danger">{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="mail_port" class="form-label">{{ __('Mail Port') }}</label>
+                                    <input type="text" name="mail_port" id="mail_port" class="form-control"
+                                        placeholder="{{ __('Enter Mail Port') }}"
+                                        value="{{ old('mail_port', $settings['mail_port'] ?? '') }}">
+                                    @error('mail_port')
+                                        <span class="invalid-feedback d-block">
+                                            <strong class="text-danger">{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <form action='#' method='post'>
 
-                            @csrf
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <form for='mail_driver' class='form-label' {{__('Mail Driver')}}>
-                                        <input type="text" name="mail_driver" class="form-control" placeholder="{{ __('Enter Mail Driver') }}" value="{{ old('mail_driver', $settings['mail_driver'] ?? '') }}">
-                                        @error('mail_driver')
-                                            <span class="invalid-mail_driver" role="alert">
-                                                <strong class="text-danger">{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="mail_host" class="form-label">{{ __('Mail Host') }}</label>
-                                        <input type="text" name="mail_host" id="mail_host" class="form-control" placeholder="{{ __('Enter Mail Host') }}" value="{{ old('mail_host', $settings['mail_host'] ?? '') }}">
-                                        @error('mail_host')
-                                            <span class="invalid-mail_driver" role="alert">
-                                                <strong class="text-danger">{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="mail_port" class="form-label">{{ __('Mail Port') }}</label>
-                                        <input type="text" name="mail_port" id="mail_port" class="form-control" placeholder="{{ __('Enter Mail Port') }}" value="{{ old('mail_port', $settings['mail_port'] ?? '') }}">
-                                        @error('mail_port')
-                                            <span class="invalid-mail_port" role="alert">
-                                                <strong class="text-danger">{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="mail_username" class="form-label">{{ __('Mail Username') }}</label>
+                                    <input type="text" name="mail_username" id="mail_username" class="form-control"
+                                        placeholder="{{ __('Enter Mail Username') }}"
+                                        value="{{ old('mail_username', $settings['mail_username'] ?? '') }}">
+                                    @error('mail_username')
+                                        <span class="invalid-feedback d-block">
+                                            <strong class="text-danger">{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
-
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="mail_username" class="form-label">{{ __('Mail Username') }}</labe>
-                                            <input type="text"
-                                                        name="mail_username"
-                                                        id="mail_username"
-                                                        class="form-control"
-                                                        placeholder="{{ __('Enter Mail Username') }}"
-                                                        value="{{ isset($settings['mail_username']) ? $settings['mail_username'] : '' }}">
-
-                                        @error('mail_username')
-                                            <span class="invalid-mail_username" role="alert">
-                                                <strong class="text-danger">{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="mail_password" class="form-label">{{ __('Mail Password') }}</label>
-                                        <input type="text"
-                                            name="mail_password"
-                                            id="mail_password"
-                                            class="form-control"
-                                            placeholder="{{ __('Enter Mail Password') }}"
-                                            value="{{ isset($settings['mail_password']) ? $settings['mail_password'] : '' }}">
-
-                                        @error('mail_password')
-                                            <span class="invalid-mail_password" role="alert">
-                                                <strong class="text-danger">{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="mail_encryption" class="form-label">{{ __('Mail Encryption') }}</label>
-                                        <input type="text"
-                                            name="mail_encryption"
-                                            id="mail_encryption"
-                                            class="form-control"
-                                            placeholder="{{ __('Enter Mail Encryption') }}"
-                                            value="{{ isset($settings['mail_encryption']) ? $settings['mail_encryption'] : '' }}">
-
-                                        @error('mail_encryption')
-                                            <span class="invalid-mail_encryption" role="alert">
-                                                <strong class="text-danger">{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="mail_password" class="form-label">{{ __('Mail Password') }}</label>
+                                    <input type="text" name="mail_password" id="mail_password" class="form-control"
+                                        placeholder="{{ __('Enter Mail Password') }}"
+                                        value="{{ old('mail_password', $settings['mail_password'] ?? '') }}">
+                                    @error('mail_password')
+                                        <span class="invalid-feedback d-block">
+                                            <strong class="text-danger">{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
-
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="mail_from_address" class="form-label">{{ __('Mail From Address') }}</label>
-                                        <input type="text"
-                                            name="mail_from_address"
-                                            id="mail_from_address"
-                                            class="form-control"
-                                            placeholder="{{ __('Enter Mail From Address') }}"
-                                            value="{{ isset($settings['mail_from_address']) ? $settings['mail_from_address'] : '' }}">
-
-                                        @error('mail_from_address')
-                                            <span class="invalid-mail_from_address" role="alert">
-                                                <strong class="text-danger">{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label for="mail_from_name" class="form-label">{{ __('Mail From Name') }}</label>
-                                        <input type="text"
-                                            name="mail_from_name"
-                                            id="mail_from_name"
-                                            class="form-control"
-                                            placeholder="{{ __('Enter Mail From Name') }}"
-                                            value="{{ isset($settings['mail_from_name']) ? $settings['mail_from_name'] : '' }}">
-
-                                        @error('mail_from_name')
-                                            <span class="invalid-mail_from_name" role="alert">
-                                                <strong class="text-danger">{{ $message }}</strong>
-                                            </span>
-                                        @enderror
-                                    </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="mail_encryption" class="form-label">{{ __('Mail Encryption') }}</label>
+                                    <input type="text" name="mail_encryption" id="mail_encryption" class="form-control"
+                                        placeholder="{{ __('Enter Mail Encryption') }}"
+                                        value="{{ old('mail_encryption', $settings['mail_encryption'] ?? '') }}">
+                                    @error('mail_encryption')
+                                        <span class="invalid-feedback d-block">
+                                            <strong class="text-danger">{{ $message }}</strong>
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
-
-                            <div class="row">
-                                <div class="card-footer d-flex justify-content-end">
-                                    <div class="form-group me-2">
-                                        <a href="#" data-url="#"
-                                            data-title="{{ __('Send Test Mail') }}" class="btn btn-primary send_email ">
-                                            {{ __('Send Test Mail') }}
-                                        </a>
-                                    </div>
-
-
-                                    <div class="form-group">
-                                        <input class="btn btn-primary" type="submit" value="{{ __('Save Changes') }}">
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
                         </div>
-                    </div>
 
+                        <div class="row mt-3">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="mail_from_address" class="form-label">{{ __('Mail From Address') }}</label>
+                                    <input type="text" name="mail_from_address" id="mail_from_address" class="form-control"
+                                        placeholder="{{ __('Enter Mail From Address') }}"
+                                        value="{{ old('mail_from_address', $settings['mail_from_address'] ?? '') }}">
+                                    @error('mail_from_address')
+                                        <span class="invalid-feedback d-block">
+                                            <strong class="text-danger">{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="mail_from_name" class="form-label">{{ __('Mail From Name') }}</label>
+                                    <input type="text" name="mail_from_name" id="mail_from_name" class="form-control"
+                                        placeholder="{{ __('Enter Mail From Name') }}"
+                                        value="{{ old('mail_from_name', $settings['mail_from_name'] ?? '') }}">
+                                    @error('mail_from_name')
+                                        <span class="invalid-feedback d-block">
+                                            <strong class="text-danger">{{ $message }}</strong>
+                                        </span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
 
-@endsection
+                        <div class="row mt-4">
+                            <div class="col-12 d-flex justify-content-end">
+                                <div class="me-2">
+                                    <a href="#" class="btn btn-outline-primary send_email" data-url="#" data-title="{{ __('Send Test Mail') }}">
+                                        {{ __('Send Test Mail') }}
+                                    </a>
+                                </div>
+                                <div>
+                                    <button type="submit" class="btn btn-primary">
+                                        {{ __('Save Changes') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        @endsection

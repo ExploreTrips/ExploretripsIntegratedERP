@@ -4,7 +4,6 @@
     $languages=\App\Models\Utility::languages();
 
     $lang = isset($users->lang)?$users->lang:'en';
-    // echo $lang;die;
     if ($lang == null) {
         $lang = 'en';
     }
