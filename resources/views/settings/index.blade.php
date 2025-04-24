@@ -359,7 +359,7 @@
                     mail_from_name: $("#mail_from_name").val(),
 
                 }, function(data) {
-                    $('#commonModal .body').html(data);
+                    $('#commonModal .modal-body').html(data);
                 });
             }
         });
@@ -476,7 +476,7 @@
                                 class="list-group-item list-group-item-action border-0">{{ __('Email Settings') }}
                                 <div class="float-end"><i class="ti ti-chevron-right"></i></div>
                             </a>
-                            <a href="#payment-settings"
+                            {{-- <a href="#payment-settings"
                                 class="list-group-item list-group-item-action border-0">{{ __('Payment Settings') }}
                                 <div class="float-end"><i class="ti ti-chevron-right"></i></div>
                             </a>
@@ -507,7 +507,7 @@
                             <a href="#chat-gpt-settings"
                                 class="list-group-item list-group-item-action border-0">{{ __('Chat GPT Settings') }}
                                 <div class="float-end"><i class="ti ti-chevron-right"></i></div>
-                            </a>
+                            </a> --}}
 
                         </div>
                     </div>
@@ -854,7 +854,7 @@
                         class="text-muted">{{ __('This SMTP will be used for system-level email sending. Additionally, if a company user does not set their SMTP, then this SMTP will be used for sending emails.') }}</small>
                 </div>
                 <div class="card-body">
-                    <form action="#" method="post">
+                    <form action="{{route('email.settings')}}" method="post">
                         @csrf
                         <div class="row">
                             <div class="col-md-4">
@@ -886,7 +886,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="mail_port" class="form-label">{{ __('Mail Port') }}</label>
-                                    <input type="text" name="mail_port" id="mail_port" class="form-control"
+                                    <input type="number" name="mail_port" id="mail_port" class="form-control"
                                         placeholder="{{ __('Enter Mail Port') }}"
                                         value="{{ old('mail_port', $settings['mail_port'] ?? '') }}">
                                     @error('mail_port')
@@ -972,7 +972,7 @@
                         <div class="row mt-4">
                             <div class="col-12 d-flex justify-content-end">
                                 <div class="me-2">
-                                    <a href="#" class="btn btn-outline-primary send_email" data-url="#" data-title="{{ __('Send Test Mail') }}">
+                                    <a href="#" class="btn btn-outline-primary send_email" data-url="{{ route('test.mail') }}" data-title="{{ __('Send Test Mail') }}">
                                         {{ __('Send Test Mail') }}
                                     </a>
                                 </div>

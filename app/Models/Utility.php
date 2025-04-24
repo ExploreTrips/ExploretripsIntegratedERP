@@ -2398,106 +2398,6 @@ class Utility extends Model
         }
     }
 
-    public static function sendEmailTemplate($emailTemplate, $mailTo, $obj)
-    {
-        $usr = Auth::user();
-        //Remove Current Login user Email don't send mail to them
-        // unset($mailTo[$usr->id]);
-        $mailTo = array_values($mailTo);
-        if ($usr->type != 'Super Admin') {
-            // find template is exist or not in our record
-            $template = EmailTemplate::where('name', 'LIKE', $emailTemplate)->first();
-            if (isset($template) && !empty($template)) {
-                // check template is active or not by company
-                if ($usr->type != 'super admin') {
-                    $is_active = UserEmailTemplate::where('template_id', '=', $template->id)->where('user_id', '=', $usr->creatorId())->first();
-                } else {
-                    $is_active = (object) array('is_active' => 1);
-                }
-                if ($is_active->is_active == 1) {
-
-                    $settings = self::settingsById($usr->id);
-
-                    $data = Utility::getSetting();
-
-                    $setting = [
-                        'mail_driver' => '',
-                        'mail_host' => '',
-                        'mail_port' => '',
-                        'mail_encryption' => '',
-                        'mail_username' => '',
-                        'mail_password' => '',
-                        'mail_from_address' => '',
-                        'mail_from_name' => '',
-
-                    ];
-                    foreach ($data as $row) {
-                        $setting[$row->name] = $row->value;
-                    }
-                    // get email content language base
-                    $content = EmailTemplateLang::where('parent_id', '=', $template->id)->where('lang', 'LIKE', $usr->lang)->first();
-
-                    $content->from = $template->from;
-                    if (!empty($content->content)) {
-
-                        $content->content = self::replaceVariable($content->content, $obj);
-                        // send email
-
-                        try
-                        {
-                            config(
-                                [
-                                    'mail.driver' => $settings['mail_driver'] ? $settings['mail_driver'] : $setting['mail_driver'],
-                                    'mail.host' => $settings['mail_host'] ? $settings['mail_host'] : $setting['mail_host'],
-                                    'mail.port' => $settings['mail_port'] ? $settings['mail_port'] :$setting['mail_port'],
-                                    'mail.encryption' => $settings['mail_encryption'] ? $settings['mail_encryption'] : $setting['mail_encryption'],
-                                    'mail.username' => $settings['mail_username'] ? $settings['mail_username'] : $setting['mail_username'],
-                                    'mail.password' => $settings['mail_password'] ? $settings['mail_password'] : $setting['mail_password'],
-                                    'mail.from.address' => $settings['mail_from_address'] ? $settings['mail_from_address'] : $setting['mail_from_address'],
-                                    'mail.from.name' => $settings['mail_from_name'] ? $settings['mail_from_name'] : $setting['mail_from_name'],
-                                ]
-                            );
-
-                            Mail::to($mailTo)->send(new CommonEmailTemplate($content, $settings));
-                        } catch (\Exception $e) {
-                            // $error = $e->getMessage();
-                            $error = 'Mail not send!';
-                        }
-
-                        if (isset($error)) {
-                            $arReturn = [
-                                'is_success' => false,
-                                'error' => $error,
-                            ];
-                        } else {
-                            $arReturn = [
-                                'is_success' => true,
-                                'error' => false,
-                            ];
-                        }
-                    } else {
-                        $arReturn = [
-                            'is_success' => false,
-                            'error' => __('Mail not send, email is empty'),
-                        ];
-                    }
-
-                    return $arReturn;
-                } else {
-                    return [
-                        'is_success' => true,
-                        'error' => false,
-                    ];
-                }
-            } else {
-                return [
-                    'is_success' => false,
-                    'error' => __('Mail not send, email not found'),
-                ];
-            }
-        }
-    }
-
     public static function sendUserEmailTemplate($emailTemplate, $mailTo, $obj)
     {
         $usr = Auth::user();
@@ -2856,19 +2756,15 @@ class Utility extends Model
             'task_start_date' => '',
             'task_end_date' => '',
             'invoice_payment_method' => '',
-         ];
-
+        ];
         foreach ($obj as $key => $val) {
             $arrValue[$key] = $val;
         }
-
         $settings = Utility::settings();
         $company_name = $settings['company_name'];
-
         $arrValue['app_name'] = !empty($company_name) ? $company_name : env('APP_NAME');
         $arrValue['company_name'] = self::settings()['mail_from_name'];
         $arrValue['app_url'] = '<a href="' . env('APP_URL') . '" target="_blank">' . env('APP_URL') . '</a>';
-
         return str_replace($arrVariable, array_values($arrValue), $content);
     }
 

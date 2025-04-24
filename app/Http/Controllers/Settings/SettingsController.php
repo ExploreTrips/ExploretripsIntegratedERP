@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Settings;
 use App\Models\Utility;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
-class SettingsContrpller extends Controller
+class SettingsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -41,7 +44,7 @@ class SettingsContrpller extends Controller
     public function store(Request $request)
     {
 
-        if (\Auth::user()->can('manage system settings')) {
+        if (Auth::user()->can('manage system settings')) {
             if ($request->hasFile('logo_dark')) {
                 $logoName = 'logo-dark.png';
                 $dir = 'uploads/logo';
@@ -99,13 +102,10 @@ class SettingsContrpller extends Controller
                     return redirect()->back()->with('error', 'Failed to upload logo.');
                 }
             }
-
             $settings = Utility::settings();
-
             if (
                 !empty($request->title_text) || !empty($request->color) || !empty($request->SITE_RTL)
-                || !empty($request->footer_text) || !empty($request->default_language) || isset($request->display_landing_page)
-                || isset($request->gdpr_cookie) || isset($request->enable_signup) || isset($request->email_verification)
+                || !empty($request->footer_text) || !empty($request->default_language) || isset($request->enable_signup) || isset($request->email_verification)
                 || isset($request->color) || !empty($request->cust_theme_bg) || !empty($request->cust_darklayout)
             ) {
                 $post = $request->all();
@@ -118,7 +118,6 @@ class SettingsContrpller extends Controller
                 } else {
                     $post['color'] = $request->custom_color;
                 }
-
                 if (!isset($request->display_landing_page)) {
                     $post['display_landing_page'] = 'off';
                 }
@@ -131,162 +130,140 @@ class SettingsContrpller extends Controller
                 if (!isset($request->email_verification)) {
                     $post['email_verification'] = 'off';
                 }
-
-
                 if (!isset($request->cust_theme_bg)) {
                     $cust_theme_bg = (!empty($request->cust_theme_bg)) ? 'on' : 'off';
                     $post['cust_theme_bg'] = $cust_theme_bg;
                 }
                 if (!isset($request->cust_darklayout)) {
-
                     $cust_darklayout = (!empty($request->cust_darklayout)) ? 'on' : 'off';
                     $post['cust_darklayout'] = $cust_darklayout;
                 }
-
                 unset($post['_token'], $post['company_logo_dark'], $post['company_logo_light'], $post['company_favicon'], $post['custom_color']);
-
+                $userId = Auth::user()->creatorId();
                 foreach ($post as $key => $data) {
-                    if (in_array($key, array_keys($settings))) {
-                        \DB::insert(
-                            'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                    if(array_key_exists($key,$settings)){
+                        DB::table('settings')->updateOrInsert(
                             [
-                                $data,
-                                $key,
-                                \Auth::user()->creatorId(),
+                                'name' => $key,
+                                'created_by' => $userId
+                            ],
+                            [
+                                'value' => $data
                             ]
                         );
+
                     }
                 }
             }
-
             return redirect()->back()->with('success', 'Brand Setting successfully updated.');
         } else {
             return redirect()->back()->with('error', 'Permission denied.');
         }
     }
 
+    public function saveEmailSettings(Request $request)
+    {
+        if (!\Auth::user()->can('manage system settings')) {
+            return redirect()->back()->with('error', 'Permission denied.');
+        }
+        $request->validate([
+            'mail_driver'       => 'required|string|max:255',
+            'mail_host'         => 'required|string|max:255',
+            'mail_port'         => 'required|numeric',
+            'mail_username'     => 'required|string|max:255',
+            'mail_password'     => 'required|string|max:255',
+            'mail_encryption'   => 'required|string|max:255',
+            'mail_from_address' => 'required|email|max:255',
+            'mail_from_name'    => 'required|string|max:255',
+        ]);
+        $post = $request->except('_token');
+        $settings = Utility::settings();
+        $userId = \Auth::user()->creatorId();
+        foreach ($post as $key => $value) {
+            if (array_key_exists($key, $settings)) {
+                \DB::table('settings')->updateOrInsert(
+                    ['name' => $key, 'created_by' => $userId],
+                    ['value' => $value]
+                );
+            }
+        }
+        return redirect()->back()->with('success', __('Setting successfully updated.'));
+    }
 
-//     public function store(Request $request)
-// {
-//     if (\Auth::user()->can('manage system settings')) {
-//         if ($request->logo_dark) {
-//             $logoName = 'logo-dark.png';
-//             $dir = 'uploads/logo'; // New path inside storage/app/public
-//             $validation = [
-//                 'mimes:' . 'png',
-//                 'max:' . '20480',
-//             ];
+    public function mailTest(Request $request)
+    {
+        $data = $request->only([
+            'mail_driver',
+            'mail_host',
+            'mail_port',
+            'mail_username',
+            'mail_password',
+            'mail_encryption',
+            'mail_from_address',
+            'mail_from_name',
+        ]);
+        return view('settings.test_mail', compact('data'));
+    }
 
-//             // Ensure it stores the file in public storage
-//             $path = $request->file('logo_dark')->storeAs('public/' . $dir, $logoName);
 
-//             // If path is saved successfully
-//             if ($path) {
-//                 // Store the public path
-//                 $logo = 'storage/' . $dir . '/' . $logoName;
-//             } else {
-//                 return redirect()->back()->with('error', 'Failed to upload logo.');
-//             }
-//         }
+    // public function testSendMail(Request $request)
+    // {
 
-//         if ($request->logo_light) {
-//             $logoName = 'logo-light.png';
-//             $dir = 'uploads/logo';
-//             $validation = [
-//                 'mimes:' . 'png',
-//                 'max:' . '20480',
-//             ];
+    //     $validator = \Validator::make(
+    //         $request->all(),
+    //         [
+    //             'email' => 'required|email',
+    //             'mail_driver' => 'required',
+    //             'mail_host' => 'required',
+    //             'mail_port' => 'required',
+    //             'mail_username' => 'required',
+    //             'mail_password' => 'required',
+    //             'mail_from_address' => 'required',
+    //             'mail_from_name' => 'required',
+    //         ]
+    //     );
+    //     if ($validator->fails()) {
+    //         $messages = $validator->getMessageBag();
+    //         return response()->json(
+    //             [
+    //                 'is_success' => false,
+    //                 'message' => $messages->first(),
+    //             ]
+    //         );
+    //         // return redirect()->back()->with('error', $messages->first());
+    //     }
 
-//             // Store file in public storage
-//             $path = $request->file('logo_light')->storeAs('public/' . $dir, $logoName);
+    //     try {
+    //         config(
+    //             [
+    //                 'mail.driver' => $request->mail_driver,
+    //                 'mail.host' => $request->mail_host,
+    //                 'mail.port' => $request->mail_port,
+    //                 'mail.encryption' => $request->mail_encryption,
+    //                 'mail.username' => $request->mail_username,
+    //                 'mail.password' => $request->mail_password,
+    //                 'mail.from.address' => $request->mail_from_address,
+    //                 'mail.from.name' => $request->mail_from_name,
+    //             ]
+    //         );
+    //         Mail::to($request->email)->send(new TestMail());
+    //     } catch (\Exception $e) {
+    //         return response()->json(
+    //             [
+    //                 'success' => false,
+    //                 'message' => $e->getMessage(),
+    //             ]
+    //         );
+    //     }
 
-//             if ($path) {
-//                 $logo = 'storage/' . $dir . '/' . $logoName;
-//             } else {
-//                 return redirect()->back()->with('error', 'Failed to upload light logo.');
-//             }
-//         }
+    //     return response()->json(
+    //         [
+    //             'success' => true,
+    //             'message' => __('Email send Successfully'),
+    //         ]
+    //     );
+    // }
 
-//         if ($request->favicon) {
-//             $favicon = 'favicon.png';
-//             $dir = 'uploads/logo';
-//             $validation = [
-//                 'mimes:' . 'png',
-//                 'max:' . '20480',
-//             ];
-
-//             // Store favicon in public storage
-//             $path = $request->file('favicon')->storeAs('public/' . $dir, $favicon);
-
-//             if ($path) {
-//                 $favicon = 'storage/' . $dir . '/' . $favicon;
-//             } else {
-//                 return redirect()->back()->with('error', 'Failed to upload favicon.');
-//             }
-//         }
-
-//         $settings = Utility::settings();
-
-//         if (
-//             !empty($request->title_text) || !empty($request->color) || !empty($request->SITE_RTL)
-//             || !empty($request->footer_text) || !empty($request->default_language) || isset($request->display_landing_page)
-//             || isset($request->gdpr_cookie) || isset($request->enable_signup) || isset($request->email_verification)
-//             || isset($request->color) || !empty($request->cust_theme_bg) || !empty($request->cust_darklayout)
-//         ) {
-//             $post = $request->all();
-
-//             $SITE_RTL = $request->has('SITE_RTL') ? $request->SITE_RTL : 'off';
-//             $post['SITE_RTL'] = $SITE_RTL;
-
-//             if (isset($request->color) && $request->color_flag == 'false') {
-//                 $post['color'] = $request->color;
-//             } else {
-//                 $post['color'] = $request->custom_color;
-//             }
-
-//             if (!isset($request->display_landing_page)) {
-//                 $post['display_landing_page'] = 'off';
-//             }
-//             if (!isset($request->gdpr_cookie)) {
-//                 $post['gdpr_cookie'] = 'off';
-//             }
-//             if (!isset($request->enable_signup)) {
-//                 $post['enable_signup'] = 'off';
-//             }
-//             if (!isset($request->email_verification)) {
-//                 $post['email_verification'] = 'off';
-//             }
-
-//             if (!isset($request->cust_theme_bg)) {
-//                 $cust_theme_bg = (!empty($request->cust_theme_bg)) ? 'on' : 'off';
-//                 $post['cust_theme_bg'] = $cust_theme_bg;
-//             }
-//             if (!isset($request->cust_darklayout)) {
-//                 $cust_darklayout = (!empty($request->cust_darklayout)) ? 'on' : 'off';
-//                 $post['cust_darklayout'] = $cust_darklayout;
-//             }
-
-//             unset($post['_token'], $post['company_logo_dark'], $post['company_logo_light'], $post['company_favicon'], $post['custom_color']);
-
-//             foreach ($post as $key => $data) {
-//                 if (in_array($key, array_keys($settings))) {
-//                     \DB::insert(
-//                         'insert into settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
-//                         [
-//                             $data,
-//                             $key,
-//                             \Auth::user()->creatorId(),
-//                         ]
-//                     );
-//                 }
-//             }
-//         }
-
-//         return redirect()->back()->with('success', 'Brand Setting successfully updated.');
-//     } else {
-//         return redirect()->back()->with('error', 'Permission denied.');
-//     }
-// }
 
 
 
