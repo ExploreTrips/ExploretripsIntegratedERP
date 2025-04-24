@@ -9,6 +9,7 @@ use Validator;
 use App\Models\Plan;
 use App\Models\User;
 use App\Models\Utility;
+use App\Helpers\MailHelper;
 use App\Models\CustomField;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -152,7 +153,7 @@ class UserController extends Controller
                     'email' => $user->email,
                     'password' => $user->password,
                 ];
-                $resp = Utility::sendEmailTemplate('new_user', [$user->id => $user->email], $userArr);
+                $resp = MailHelper::sendEmailTemplate('new_user', [$user->id => $user->email], $userArr);
                 if (\Auth::user()->type == 'super admin') {
                     return redirect()->route('users.index')->with('success', __('Company successfully created.') . ((!empty($resp) && $resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
                 } else {
@@ -231,7 +232,6 @@ class UserController extends Controller
                 }
             Impersonate::take($request->user(), $user);
             return redirect('/account-dashboard')->with('success', 'You are now logged in as the selected company.');
-
         }
         return redirect()->back()->with('error', 'Unable to impersonate the user.');
     }

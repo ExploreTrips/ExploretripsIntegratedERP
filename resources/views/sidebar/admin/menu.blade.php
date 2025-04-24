@@ -1576,17 +1576,15 @@
                 @endif
                 <li
                     class="dash-item dash-hasmenu {{ Request::segment(1) == 'email_template' || Request::route()->getName() == 'manage.email.language' ? ' active dash-trigger' : 'collapsed' }}">
-                    <a href="#"
+                    <a href="{{route('manage.email.language',[$emailTemplate->id, auth()->user()->lang])}}"
                         class="dash-link">
                         <span class="dash-micon"><i class="ti ti-template"></i></span>
                         <span class="dash-mtext">{{ __('Email Template') }}</span>
                     </a>
                 </li>
-
                 @if (\Auth::user()->type == 'super admin')
                     @include('landingpage::menu.landingpage')
                 @endif
-
                 @if (Gate::check('manage system settings'))
                     <li
                         class="dash-item dash-hasmenu {{ Request::route()->getName() == 'systems.index' ? ' active' : '' }}">

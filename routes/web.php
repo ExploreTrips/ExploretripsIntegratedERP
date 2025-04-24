@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\MailController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\Settings\SettingsController;
 use App\Http\Controllers\Settings\SettingsContrpller;
 use App\Http\Controllers\Dashboard\DashboardController;
 
@@ -51,7 +53,20 @@ Route::group([
     Route::get('user-login/{id}', [UserController::class, 'LoginManage'])->name('users.login');
 
     // SystemController Routes
-    Route::resource('systems', SettingsContrpller::class);
+    Route::resource('systems', SettingsController::class);
+
+    // MailConfiguration Settings
+    Route::post('email-settings', [SettingsController::class, 'saveEmailSettings'])->name('email.settings');
+    Route::get('test-mail', [SettingsController::class, 'mailTest'])->name('test.mail');
+    // Route::post('test-mail/send', [SettingsController::class, 'testSendMail'])->name('test.send.mail');
+
+
+    // Template Routes
+    Route::get('email_template_lang/{id}/{lang?}', [MailController::class, 'manageEmailLang'])->name('manage.email.language');
+
+
+
+
 
 
 });
