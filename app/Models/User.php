@@ -4,13 +4,14 @@ namespace App\Models;
 
 use App\Models\Plan;
 use App\Models\User;
+use App\Models\Employees;
 use App\Models\EmailTemplate;
 use App\Models\UserEmailTemplate;
 use Laravel\Sanctum\HasApiTokens;
-use Lab404\Impersonate\Models\Impersonate;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
+use Lab404\Impersonate\Models\Impersonate;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -2936,7 +2937,6 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(Plan::class, 'id', 'plan');
     }
 
-
     public function totalCompanyUsers($id)
     {
         return User::where('created_by', '=', $id)->count();
@@ -2952,8 +2952,8 @@ class User extends Authenticatable implements MustVerifyEmail
         return Vender::where('created_by', '=', $id)->count();
     }
 
-
-
-
-
+    public function countEmployees()
+    {
+        return Employees::where('created_by', '=', $this->creatorId())->count();
+    }
 }

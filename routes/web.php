@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\BranchController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Settings\SettingsController;
 use App\Http\Controllers\Settings\SettingsContrpller;
+use App\Http\Controllers\HrmSystem\EmployeeController;
 use App\Http\Controllers\Dashboard\DashboardController;
 
 
@@ -64,11 +67,18 @@ Route::group([
     // Template Routes
     Route::get('email_template_lang/{id}/{lang?}', [MailController::class, 'manageEmailLang'])->name('manage.email.language');
 
+    // EmployeeController Routes
+    Route::resource('employee', EmployeeController::class);
+    Route::get('/get-employee-id/{branch_id}', [EmployeeController::class, 'getEmployeeId']);
+    Route::post('/get-departments', [EmployeeController::class, 'getDepartments']);
+    Route::post('/get-designations', [EmployeeController::class, 'getDesignations'])->name('get.designations');
+    Route::get('import/employee/file', [EmployeeController::class, 'fileImport'])->name('employee.file.import');
+    Route::get('import/employee/modal', [EmployeeController::class, 'fileImportModal'])->name('employee.import.modal');
 
 
 
-
-
+    Route::resource('branch', BranchController::class);
+    Route::resource('document', DocumentController::class);
 });
 
 // cache

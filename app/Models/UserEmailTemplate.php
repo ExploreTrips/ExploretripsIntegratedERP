@@ -11,7 +11,7 @@ class UserEmailTemplate extends Model
 {
     use HasFactory;
 
-    protected $table = 'user_email_templates'; // Explicitly specify table name for clarity
+    protected $table = 'user_email_templates';
 
     protected $fillable = [
         'template_id',

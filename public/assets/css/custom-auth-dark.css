@@ -3,12 +3,12 @@
 }
 .custom-login .navbar {
     background: var(--bs-dark);
-   
+
 }
 
 .custom-login .navbar .nav-link ,
 body .custom-login .dash-header .drp-language .drp-text{
-   
+
     color: var(--bs-white);
 }
 .custom-login .dropdown-toggle::after {
@@ -19,7 +19,7 @@ body .custom-login .dash-header .drp-language .drp-text{
     background-color: var(--bs-card-bg);
 }
 .custom-login .navbar .nav-item .nav-link::after {
-  
+
     background: var(--bs-white);
 }
 .custom-login .drp-language a span{

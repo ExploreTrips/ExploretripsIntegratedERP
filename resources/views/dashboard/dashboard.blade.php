@@ -123,12 +123,19 @@
                                         </div>
                                         <div class="col-md-6 ">
                                             @if(!empty($employeeAttendance) && $employeeAttendance->clock_out == '00:00:00')
-                                                {{Form::model($employeeAttendance,array('route'=>array('attendanceemployee.update',$employeeAttendance->id),'method' => 'PUT')) }}
-                                                <button type="submit" value="1" name="out" id="clock_out" class="btn btn-danger">{{__('CLOCK OUT')}}</button>
+                                                <form action="{{ route('attendanceemployee.update', $employeeAttendance->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button type="submit" value="1" name="out" id="clock_out" class="btn btn-danger">
+                                                        {{ __('CLOCK OUT') }}
+                                                    </button>
+                                                </form>
                                             @else
-                                                <button type="submit" value="1" name="out" id="clock_out" class="btn btn-danger disabled" disabled>{{__('CLOCK OUT')}}</button>
+                                                <button type="submit" value="1" name="out" id="clock_out" class="btn btn-danger disabled" disabled>
+                                                    {{ __('CLOCK OUT') }}
+                                                </button>
                                             @endif
-                                            {{Form::close()}}
+
                                         </div>
                                     </div>
                                 </center>
