@@ -6,6 +6,7 @@ use App\Models\Utility;
 use App\Models\EmailTemplate;
 use App\Mail\CommonEmailTemplate;
 use App\Models\EmailTemplateLang;
+use App\Models\UserEmailTemplate;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 
@@ -47,7 +48,7 @@ class MailHelper
                     }
 
                     $content = EmailTemplateLang::where('parent_id', $template->id)->where('lang', $usr->lang)->first();
-                    print_r($content);die;
+                    // print_r($content);die;
                     $content->from = $template->from;
                     if (!empty($content->content)) {
                         $content->content = Utility::replaceVariable($content->content, $obj);

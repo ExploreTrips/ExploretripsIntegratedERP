@@ -10,6 +10,15 @@ body.custom-color .dash-header .drp-language .drp-text,
     color: var(--color-customColor);
 }
 
+/* .custom-text-color {
+    color: var(--color-customColor);
+} */
+
+body.custom-color .info span {
+    color: var(--color-customColor);
+}
+
+
 body.custom-color .dash-header .drp-company .theme-avtar {
     background: #e9d5e7;
     color: var(--color-customColor);

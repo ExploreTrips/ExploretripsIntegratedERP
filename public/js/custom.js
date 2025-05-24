@@ -52,6 +52,7 @@ $(document).ready(function() {
 });
 
 
+
 function validation() {
     var forms = document.querySelectorAll('.needs-validation');
 

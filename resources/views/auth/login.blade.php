@@ -50,7 +50,7 @@
 @section('content')
     <div class="card-body">
         <div>
-            <h2 class="mb-3 f-w-600">{{ __('Login') }}</h2>
+            <h2 class="mb-3 f-w-600 text-center">{{ __('Login') }}</h2>
         </div>
         <form action="{{ route('login') }}" method="POST" id="loginForm" class="login-form needs-validation" novalidate>
             @csrf
