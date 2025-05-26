@@ -126,7 +126,6 @@ class EmployeeController extends Controller
                 return redirect()->back()->with('error', __('Your employee limit is over, Please upgrade plan.'));
             }
 
-            // Save plain password before hashing for email template
             $plainPassword = $request['password'];
 
             $user = User::create([

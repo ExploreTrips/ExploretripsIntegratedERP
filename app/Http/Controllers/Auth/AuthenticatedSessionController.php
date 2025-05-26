@@ -9,18 +9,20 @@ use  App\Models\User;
 use App\Models\Vender;
 use  App\Models\Utility;
 use App\Models\Customer;
+use WhichBrowser\Parser;
 use App\Models\LoginDetail;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
+use App\Http\Requests\LoginRequest;
 use App\Events\VerifyReCaptchaToken;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Providers\RouteServiceProvider;
-use App\Http\Requests\LoginRequest;
 use Spatie\Permission\Models\Permission;
+use WhichBrowser\Analyser\Header\Useragent\Browser;
 use Modules\LandingPage\Entities\LandingPageSetting;
 
 class AuthenticatedSessionController extends Controller
@@ -182,14 +184,12 @@ class AuthenticatedSessionController extends Controller
             ]
         );
 
-        //start for user log
         if($user->type != 'company' && $user->type != 'super admin')
         {
-//            $ip = '49.36.83.154'; // This is static ip address
             $ip = $_SERVER['REMOTE_ADDR']; // your ip address here
             $query = @unserialize(file_get_contents('http://ip-api.com/php/' . $ip));
 
-            $whichbrowser = new \WhichBrowser\Parser($_SERVER['HTTP_USER_AGENT']);
+            $whichbrowser = new Parser($_SERVER['HTTP_USER_AGENT']);
             if ($whichbrowser->device->type == 'bot') {
                 return;
             }

@@ -1,9 +1,7 @@
 @extends('layouts.admin')
 @php
-    // $profile=asset(Storage::url('uploads/avatar/'));
     $profile = \App\Models\Utility::get_file('uploads/avatar');
     $user = auth()->user();
-    // print_r($user);die;
 @endphp
 @section('page-title')
     @if (\Auth::user()->type == 'super admin')
@@ -18,7 +16,7 @@
     <li class="breadcrumb-item">
         <a href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a>
     </li>
-    @if (\Auth::user()->type == 'super admin')
+    @if ($user->type == 'super admin')
         <li class="breadcrumb-item">{{ __('Companies') }}</li>
     @else
         <li class="breadcrumb-item">{{ __('User') }}</li>
@@ -26,11 +24,12 @@
 @endsection
 @section('action-btn')
     <div class="float-end">
-        @if (\Auth::user()->type == 'company' || \Auth::user()->type == 'HR')
-            <a href="{{ route('user.userlog') }}" class="btn btn-primary btn-sm me-1 {{ Request::segment(1) == 'user' }}"
-                data-bs-toggle="tooltip" data-bs-placement="top" title="{{ __('User Logs History') }}"><i
-                    class="ti ti-user-check"></i>
-            </a>
+        @if ($user->type == 'company' || $user->type == 'HR')
+        <a href="{{ route('user.userlog') }}"
+        class="btn btn-primary py-2 btn-sm me-1 {{ Request::is('user*') ? 'active' : '' }}">
+         <i class="ti ti-user-check me-1"></i> {{ __('User Logs History') }}
+     </a>
+
         @endif
         @can('create user')
             <a href="#" data-size="lg" data-url="{{ route('users.create') }}" data-ajax-popup="true"
@@ -80,7 +79,7 @@
                                                 <div class="dropdown-menu dropdown-menu-end">
 
                                                     @can('edit user')
-                                                    <a href="#!" data-size="lg"
+                                                    <a href="#" data-size="lg"
                                                         data-url="{{ route('users.edit', $user->id) }}"
                                                         data-ajax-popup="true" class="dropdown-item"
                                                         data-bs-original-title="{{ auth()->user()->type == 'super admin' ? __('Edit Company') : __('Edit User') }}">
@@ -152,10 +151,8 @@
 
                             <div class="card-body full-card">
                                 <div class="img-fluid rounded-circle card-avatar">
-                                    {{-- <img src="{{ !empty($user->avatar) ? Utility::get_file($user->avatar) : asset(Storage::url('uploads/avatar/avatar.png')) }}"
-                                        class="" width="120px" height="120px" alt="user-image"> --}}
-                                    <img src="{{ asset('assets/images/user/avatar-2.jpg') }}" width="100px" height="100px"
-                                        alt="{{ $user->name }}">
+                                    <img src="{{ !empty($user->avatar) ? \App\Models\Utility::get_file($user->avatar) : asset(Storage::url('avatars/__avatar.png')) }}"
+                                        class="" width="120px" height="120px" alt="user-image">
                                 </div>
                                 <h4 class=" mt-3 text-primary">{{ $user->name }}</h4>
                                 @if ($user->delete_status == 0)

@@ -76,9 +76,17 @@ Route::group([
     Route::get('import/employee/modal', [EmployeeController::class, 'fileImportModal'])->name('employee.import.modal');
 
 
-
+    // HrmSystem Setup Routes
     Route::resource('branch', BranchController::class);
     Route::resource('document', DocumentController::class);
+
+    // UserLogHistory Routes
+    Route::get('/userlogs', [UserController::class, 'userLog'])->name('user.userlog');
+    Route::get('userlogs/{id}', [UserController::class, 'userLogView'])->name('user.userlogview');
+    Route::delete('userlogs/{id}', [UserController::class, 'userLogDestroy'])->name('user.userlogdestroy');
+
+
+
 });
 
 // cache

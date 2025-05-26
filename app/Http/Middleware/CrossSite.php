@@ -22,11 +22,7 @@ class CrossSite
                 Config::set('app.timezone', $settings['timezone']);
                 date_default_timezone_set(Config::get('app.timezone', 'UTC'));
             }
-
-            // Set locale
             app()->setLocale($user->lang ?? config('app.locale'));
-
-            // Super admin check for pending updates
             if ($user->type === 'super admin') {
                 $migrations = $this->getMigrations();
                 $dbMigrations = $this->getExecutedMigrations();
@@ -36,7 +32,6 @@ class CrossSite
                 if ($pendingUpdates > 0) {
                     Utility::addNewData();
                     User::defaultEmail();
-
                     $companies = User::where('type', 'company')->get();
                     foreach ($companies as $companyUser) {
                         $companyUser->userDefaultDataRegister($companyUser->id);
