@@ -85,6 +85,24 @@ class User extends Authenticatable implements MustVerifyEmail
         }
     }
 
+    public function countUsers()
+    {
+        return User::whereNotIn('type', ['super admin', 'company', 'client'])
+            ->where('created_by', $this->creatorId())
+            ->count();
+    }
+
+    public function getProfileAttribute()
+    {
+
+        if (!empty($this->avatar) && \Storage::exists($this->avatar)) {
+            return $this->attributes['avatar'] = asset(\Storage::url($this->avatar));
+        } else {
+            return $this->attributes['avatar'] = asset(\Storage::url('avatar.png'));
+        }
+    }
+
+
     public static function defaultEmail()
     {
         // Email Template

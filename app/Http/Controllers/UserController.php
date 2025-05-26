@@ -9,8 +9,10 @@ use Validator;
 use App\Models\Plan;
 use App\Models\User;
 use App\Models\Utility;
+use App\Models\Employees;
 use App\Helpers\MailHelper;
 use App\Models\CustomField;
+use App\Models\LoginDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
@@ -48,127 +50,147 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        if (\Auth::user()->can('create user')) {
-            $default_language = DB::table('settings')->select('value')->where('name', 'default_language')->where('created_by', '=', \Auth::user()->creatorId())->first();
-            $objUser = \Auth::user()->creatorId();
-            if (\Auth::user()->type == 'super admin') {
-                $validator = Validator::make(
-                    $request->all(), [
-                        'name' => 'required|max:120',
-                        'email' => 'required|email|unique:users',
-                    ]
-                );
-                if ($validator->fails()) {
-                    $messages = $validator->getMessageBag();
-                    return redirect()->back()->with('error', $messages->first());
-                }
-                $enableLogin = 0;
-                if (!empty($request->password_switch) && $request->password_switch == 'on') {
-                    $enableLogin = 1;
-                    $validator = \Validator::make(
-                        $request->all(), ['password' => 'required|min:6']
-                    );
-                    if ($validator->fails()) {
-                        return redirect()->back()->with('error', $validator->errors()->first());
-                    }
-                }
-                $userpassword = $request->input('password');
-                $settings = Utility::settings();
-                do {
-                    $code = rand(100000, 999999);
-                } while (User::where('referral_code', $code)->exists());
-                $user = new User();
-                $user['name'] = $request->name;
-                $user['email'] = $request->email;
-                $psw = $request->password;
-                $user['password'] = !empty($userpassword)?Hash::make($userpassword) : null;
-                $user['type'] = 'company';
-                $user['default_pipeline'] = 1;
-                $user['plan'] = 1;
-                $user['lang'] = !empty($default_language) ? $default_language->value : 'en';
-                $user['referral_code'] = $code;
-                $user['created_by'] = \Auth::user()->creatorId();
-                $user['plan'] = Plan::first()->id;
-                if ($settings['email_verification'] == 'on') {
-                    $user['email_verified_at'] = null;
-                } else {
-                    $user['email_verified_at'] = date('Y-m-d H:i:s');
-                }
-                $user['is_enable_login'] = $enableLogin;
-                $user->save();
-                $role_r = Role::findByName('company');
-                $user->assignRole($role_r);
-            } else {
-                $validator = \Validator::make(
-                    $request->all(), [
-                        'name' => 'required|max:120',
-                        'email' => 'required|email|unique:users',
-                        'role' => 'required',
-                    ]
-                );
-                if ($validator->fails()) {
-                    $messages = $validator->getMessageBag();
-                    return redirect()->back()->with('error', $messages->first());
-                }
-                $enableLogin = 0;
-                if (!empty($request->password_switch) && $request->password_switch == 'on') {
-                    $enableLogin = 1;
-                    $validator = \Validator::make(
-                        $request->all(), ['password' => 'required|min:6']
-                    );
-                    if ($validator->fails()) {
-                        return redirect()->back()->with('error', $validator->errors()->first());
-                    }
-                }
-                $objUser = User::find($objUser);
-                $user = User::find(\Auth::user()->created_by);
-                $total_user = $objUser->countUsers();
-                $plan = Plan::find($objUser->plan);
-                $userpassword = $request->input('password');
-                if ($total_user < $plan->max_users || $plan->max_users == -1) {
-                    $role_r = Role::findById($request->role);
-                    $psw = $request->password;
-                    $request['password'] = !empty($userpassword)?\Hash::make($userpassword) : null;
-                    $request['type'] = $role_r->name;
-                    $request['lang'] = !empty($default_language) ? $default_language->value : 'en';
-                    $request['created_by'] = \Auth::user()->creatorId();
-                    $request['email_verified_at'] = date('Y-m-d H:i:s');
-                    $request['is_enable_login'] = $enableLogin;
-                    $user = User::create($request->all());
-                    $user->assignRole($role_r);
-                    if ($request['type'] != 'client') {
-                        Utility::employeeDetails($user->id, \Auth::user()->creatorId());
-                    }
-                } else {
-                    return redirect()->back()->with('error', __('Your user limit is over, Please upgrade plan.'));
-                }
+        if (!auth()->user()->can('create user')) {
+            return redirect()->back();
+        }
+
+        $default_language = DB::table('settings')->select('value')
+            ->where('name', 'default_language')
+            ->where('created_by', \Auth::user()->creatorId())
+            ->first();
+
+        $creatorId = auth()->user()->creatorId();
+        $settings = Utility::settings();
+
+        $enableLogin = 0;
+        $psw = null;
+        $avatarPath = null;
+
+        if (!empty($request->password_switch) && $request->password_switch == 'on') {
+            $enableLogin = 1;
+
+            $validator = Validator::make($request->all(), ['password' => 'required|min:6']);
+            if ($validator->fails()) {
+                return redirect()->back()->with('error', $validator->errors()->first());
             }
-            // Send Email
-            $setings = Utility::settings();
-            if ($setings['new_user'] == 1) {
+
+            $psw = $request->password;
+        }
+
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $avatarPath = $file->storeAs('avatars', $filename, 'public');
+        }
+
+        if (auth()->user()->type == 'super admin') {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'name' => 'required|max:120',
+                    'email' => 'required|email|unique:users',
+                    'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                ]
+            );
+
+            if ($validator->fails()) {
+                return redirect()->back()->with('error', $validator->errors()->first());
+            }
+
+            do {
+                $code = rand(100000, 999999);
+            } while (User::where('referral_code', $code)->exists());
+
+            $user = new User();
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->password = $psw ? Hash::make($psw) : null;
+            $user->type = 'company';
+            $user->default_pipeline = 1;
+            $user->plan = Plan::first()->id ?? 1;
+            $user->lang = !empty($default_language) ? $default_language->value : 'en';
+            $user->referral_code = $code;
+            $user->created_by = $creatorId;
+            $user->email_verified_at = $settings['email_verification'] === 'on' ? null : now();
+            $user->is_enable_login = $enableLogin;
+            $user->avatar = $avatarPath;
+            $user->save();
+
+            $role_r = Role::findByName('company');
+            $user->assignRole($role_r);
+        } else {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'name' => 'required|max:120',
+                    'email' => 'required|email|unique:users',
+                    'role' => 'required',
+                    'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                ]
+            );
+
+            if ($validator->fails()) {
+                return redirect()->back()->with('error', $validator->errors()->first());
+            }
+
+            $objUser = User::find($creatorId);
+            $total_user = $objUser->countUsers();
+            $plan = Plan::find($objUser->plan);
+
+            if ($total_user < $plan->max_users || $plan->max_users == -1) {
+                $role_r = Role::findById($request->role);
+
+                $userData = $request->all();
+                $userData['password'] = $psw ? Hash::make($psw) : null;
+                $userData['type'] = $role_r->name;
+                $userData['lang'] = !empty($default_language) ? $default_language->value : 'en';
+                $userData['created_by'] = $creatorId;
+                $userData['email_verified_at'] = now();
+                $userData['is_enable_login'] = $enableLogin;
+                $userData['avatar'] = $avatarPath;
+
+                $user = User::create($userData);
+                $user->assignRole($role_r);
+
+                if ($userData['type'] !== 'client') {
+                    Utility::employeeDetails($user->id, $creatorId);
+                }
+            } else {
+                return redirect()->back()->with('error', __('Your user limit is over, Please upgrade plan.'));
+            }
+        }
+        if (!empty($user)) {
+            if (!empty($settings['new_user']) && $settings['new_user'] == 1) {
                 $user->password = $psw;
                 $user->type = $role_r->name;
                 $user->userDefaultDataRegister($user->id);
+
                 $userArr = [
                     'email' => $user->email,
-                    'password' => $user->password,
+                    'password' => $psw,
                 ];
+
                 $resp = MailHelper::sendEmailTemplate('new_user', [$user->id => $user->email], $userArr);
-                if (\Auth::user()->type == 'super admin') {
-                    return redirect()->route('users.index')->with('success', __('Company successfully created.') . ((!empty($resp) && $resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
-                } else {
-                    return redirect()->route('users.index')->with('success', __('User successfully created.') . ((!empty($resp) && $resp['is_success'] == false && !empty($resp['error'])) ? '<br> <span class="text-danger">' . $resp['error'] . '</span>' : ''));
+
+                $successMsg = (auth()->user()->type == 'super admin')
+                    ? __('Company successfully created.')
+                    : __('User successfully created.');
+
+                if (!empty($resp) && $resp['is_success'] == false && !empty($resp['error'])) {
+                    $successMsg .= '<br> <span class="text-danger">' . $resp['error'] . '</span>';
                 }
+
+                return redirect()->route('users.index')->with('success', $successMsg);
             }
-            if (\Auth::user()->type == 'super admin') {
-                return redirect()->route('users.index')->with('success', __('Company successfully created.'));
-            } else {
-                return redirect()->route('users.index')->with('success', __('User successfully created.'));
-            }
-        } else {
-            return redirect()->back();
+
+            return redirect()->route('users.index')->with('success', auth()->user()->type == 'super admin'
+                ? __('Company successfully created.')
+                : __('User successfully created.'));
         }
+
+        return redirect()->back()->with('error', __('Something went wrong while creating user.'));
     }
+
 
     public function edit($id)
     {
@@ -192,36 +214,63 @@ class UserController extends Controller
         if (!\Auth::user()->can('edit user')) {
             return redirect()->back()->with('error', __('Permission denied.'));
         }
+
         $user = User::findOrFail($id);
+
         $validationRules = [
             'name' => 'required|max:120',
             'email' => 'required|email|unique:users,email,' . $id,
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
+
         if (\Auth::user()->type !== 'super admin') {
             $validationRules['role'] = 'required';
         }
+
         $validator = \Validator::make($request->all(), $validationRules);
+
         if ($validator->fails()) {
             return redirect()->back()->with('error', $validator->getMessageBag()->first());
         }
+
         $input = $request->all();
+
         if (\Auth::user()->type === 'super admin') {
             $role = Role::where('name', 'company')->first();
         } else {
             $role = Role::findOrFail($request->role);
         }
+
         $input['type'] = $role->name;
+        if ($request->hasFile('avatar')) {
+            if ($user->avatar && \Storage::disk('public')->exists($user->avatar)) {
+                \Storage::disk('public')->delete($user->avatar);
+            }
+
+            $file = $request->file('avatar');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $avatarPath = $file->storeAs('avatars', $filename, 'public');
+            $input['avatar'] = $avatarPath;
+        }
+
         $user->fill($input)->save();
         $user->roles()->sync([$role->id]);
+
         if ($request->has('customField')) {
             CustomField::saveData($user, $request->customField);
         }
+
         if (\Auth::user()->type !== 'super admin') {
             Utility::employeeDetailsUpdate($user->id, \Auth::user()->creatorId());
         }
-        $message = Auth::user()->type === 'super admin'? __('Company successfully updated.'): __('User successfully updated.');
+
+        $message = \Auth::user()->type === 'super admin'
+            ? __('Company successfully updated.')
+            : __('User successfully updated.');
+
         return redirect()->route('users.index')->with('success', $message);
     }
+
 
     public function LoginWithCompany(Request $request,$id)
     {
@@ -275,41 +324,43 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        if (auth()->user()->can('delete user')) {
-            if ($id == 2) {
-                return redirect()->back()->with('error', __('You can not delete By default Company'));
-            }
-            $user = User::find($id);
-            if ($user) {
-                if (auth()->user()->type == 'super admin') {
-                    // $transaction = ReferralTransaction::where('company_id' , $id)->delete();
-                    $users = User::where('created_by', $id)->delete();
-                    // $employee = Employee::where('created_by', $id)->delete();
-                    $user->delete();
-                    return redirect()->back()->with('success', __('Company Successfully deleted'));
-                }
-
-                // if (auth()->user()->type == 'company') {
-                //     $employee = Employee::where(['user_id' => $user->id])->delete();
-                //     if ($employee) {
-                //         $delete_user = User::where(['id' => $user->id])->delete();
-                //         if ($delete_user) {
-                //             return redirect()->route('users.index')->with('success', __('User successfully deleted .'));
-                //         } else {
-                //             return redirect()->back()->with('error', __('Something is wrong.'));
-                //         }
-                //     } else {
-                //         return redirect()->back()->with('error', __('Something is wrong.'));
-                //     }
-                // }
-                // return redirect()->route('users.index')->with('success', __('User successfully deleted .'));
-            } else {
-                return redirect()->back()->with('error', __('Something is wrong.'));
-            }
-        } else {
+        if (!auth()->user()->can('delete user')) {
             return redirect()->back();
         }
+
+        if ($id == 2) {
+            return redirect()->back()->with('error', __('You cannot delete the default company.'));
+        }
+
+        $user = User::find($id);
+        if (!$user) {
+            return redirect()->back()->with('error', __('User not found.'));
+        }
+        if (auth()->user()->type == 'super admin') {
+            User::where('created_by', $id)->delete();
+            Employees::where('created_by', $id)->delete();
+            $user->delete();
+            return redirect()->back()->with('success', __('Company successfully deleted.'));
+        }
+
+        if (auth()->user()->type == 'company') {
+            $employeeDeleted = Employees::where('user_id', $user->id)->delete();
+            if ($employeeDeleted) {
+                $userDeleted = $user->delete();
+                if ($userDeleted) {
+                    return redirect()->route('users.index')->with('success', __('User successfully deleted.'));
+                } else {
+                    return redirect()->back()->with('error', __('Failed to delete user.'));
+                }
+            } else {
+                return redirect()->back()->with('error', __('Failed to delete employee record.'));
+            }
+        }
+
+        $user->delete();
+        return redirect()->route('users.index')->with('success', __('User successfully deleted.'));
     }
+
 
     public function LoginManage($id)
     {
@@ -341,4 +392,58 @@ class UserController extends Controller
             }
         }
     }
+
+        public function userLog(Request $request)
+    {
+        $filteruser = User::where('created_by', \Auth::user()->creatorId())
+            ->pluck('name', 'id')
+            ->prepend('Select User', '');
+        $query = DB::table('login_details')
+            ->join('users', 'login_details.user_id', '=', 'users.id')
+            ->select(
+                'login_details.*',
+                'users.id as user_id',
+                'users.name as user_name',
+                'users.email as user_email',
+                'users.type as user_type'
+            )
+            ->where('login_details.created_by', \Auth::user()->creatorId());
+        $month = $request->input('month');
+        if ($month) {
+            $query->whereMonth('date', date('m', strtotime($month)))
+                ->whereYear('date', date('Y', strtotime($month)));
+        } else {
+            $query->whereMonth('date', now()->month)
+                ->whereYear('date', now()->year);
+        }
+
+        if ($request->filled('users')) {
+            $query->where('login_details.user_id', $request->users);
+        }
+
+        $userdetails = $query->orderBy('date', 'desc')->get();
+        $last_login_details = LoginDetail::where('created_by', \Auth::user()->creatorId())->get();
+        return view('user.userlog', compact('userdetails', 'last_login_details', 'filteruser'));
+    }
+
+    public function userLogView($id)
+    {
+        $users = LoginDetail::find($id);
+        return view('user.userlogview', compact('users'));
+    }
+
+    public function userLogDestroy($id)
+    {
+        // echo $id;die;
+        $users = LoginDetail::where('id', $id)->delete();
+        // dd($users);
+        return redirect()->back()->with('success', 'User successfully deleted.');
+    }
+
+
+
+
+
+
+
 }

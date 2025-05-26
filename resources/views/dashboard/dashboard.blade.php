@@ -180,7 +180,7 @@
                                             <th>{{__('description')}}</th>
                                         </tr>
                                         </thead>
-                                        <tbody>
+                                        {{-- <tbody>
                                         @forelse($announcements as $announcement)
                                             <tr>
                                                 <td>{{ $announcement->title }}</td>
@@ -197,7 +197,7 @@
                                                 </td>
                                             </tr>
                                         @endforelse
-                                        </tbody>
+                                        </tbody> --}}
                                     </table>
                                 </div>
                             </div>
@@ -207,7 +207,7 @@
                                 <h4>{{__('Meeting List')}}</h4>
                             </div>
                             <div class="card-body dash-card-body">
-                                @if(count($meetings) > 0)
+                                {{-- @if(count($meetings) > 0)
                                     <div class="table-responsive">
                                         <table class="table align-items-center">
                                             <thead>
@@ -232,7 +232,7 @@
                                     <div class="p-2">
                                         {{__('No meeting scheduled yet.')}}
                                     </div>
-                                @endif
+                                @endif --}}
                             </div>
                         </div>
                     </div>

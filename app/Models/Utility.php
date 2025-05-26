@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use Twilio\Rest\Client;
 use Carbon\CarbonPeriod;
+use App\Models\Employees;
 use App\Models\ReferralSetting;
 use App\Models\TransactionLines;
 use App\Mail\CommonEmailTemplate;
@@ -2893,7 +2894,7 @@ class Utility extends Model
 
     public static function employeeNumber($user_id)
     {
-        $latest = Employee::where('created_by', $user_id)->latest()->first();
+        $latest = Employees::where('created_by', $user_id)->latest()->first();
         if (!$latest) {
             return 1;
         }
@@ -2903,8 +2904,9 @@ class Utility extends Model
     public static function employeeDetails($user_id, $created_by)
     {
         $user = User::where('id', $user_id)->first();
+        // echo $user;die;
 
-        $employee = Employee::create(
+        $employee = Employees::create(
             [
                 'user_id' => $user->id,
                 'name' => $user->name,
@@ -2914,13 +2916,15 @@ class Utility extends Model
                 'created_by' => $created_by,
             ]
         );
+
+        // print_r($employee);die;
     }
 
     public static function employeeDetailsUpdate($user_id, $created_by)
     {
         $user = User::where('id', $user_id)->first();
 
-        $employee = Employee::where('user_id', $user->id)->update(
+        $employee = Employees::where('user_id', $user->id)->update(
             [
                 'name' => $user->name,
                 'email' => $user->email,
