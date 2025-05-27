@@ -45,7 +45,137 @@
 @endsection
 
 @section('content')
-    <div class="card-body">
+    <div class="d-none d-lg-flex col-lg-7 col-xl-8 align-items-center justify-content-center p-12 pb-2">
+        <img src="{{ asset('login_template/img/auth-login-illustration-light.png')}}" class="auth-cover-illustration w-100" alt="auth-illustration" data-app-light-img="illustrations/auth-login-illustration-light.png" data-app-dark-img="illustrations/auth-login-illustration-dark.png">
+        <img alt="mask" src="{{ asset('login_template/img/auth-basic-login-mask-light.png')}}" class="authentication-image d-none d-lg-block" data-app-light-img="illustrations/auth-basic-login-mask-light.png" data-app-dark-img="illustrations/auth-basic-login-mask-dark.png">
+    </div>
+    <div class="d-flex col-12 col-lg-5 col-xl-4 align-items-center authentication-bg position-relative py-sm-12 px-12 py-6">
+        <div class="w-px-400 mx-auto pt-12 pt-lg-0">
+            <h4 class="mb-3 f-w-600 text-center">{{ __('Register') }}</h4>
+            <form action="{{ route('login') }}" method="POST" id="loginForm" class="login-form needs-validation" novalidate>
+                @csrf
+                @if (session('status'))
+                    <div class="mb-4 font-medium text-lg text-green-600 text-danger">
+                        {{ session('status') }}
+                    </div>
+                @endif
+
+                <div class="custom-login-form">
+                    <div class="form-group mb-3">
+                        <label for="name" class="form-label">{{ __('Name') }}</label>
+                        <input id="name" type="text" class="form-control @error('name') is-invalid @enderror"
+                            name="name" value="{{ old('name') }}" autocomplete="name" autofocus
+                            placeholder="{{ __('Enter Name') }}" required="required">
+                        @error('name')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div>
+                    <!-- <div class="form-group mb-3">
+                        <label class="form-label">{{ __('Password') }}</label>
+                        <input type="password" name="password" class="form-control"
+                            placeholder="{{ __('Enter Your Password') }}" id="input-password" required>
+                        @error('password')
+                            <span class="error invalid-password text-danger" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                    </div> -->
+
+                    <div class="form-group mb-3">
+                        <label for="email" class="form-label">{{ __('Email') }}</label>
+                        <input class="form-control @error('email') is-invalid @enderror" id="email" type="email"
+                            name="email" value="{{ old('email') }}" autocomplete="email" autofocus
+                            placeholder="{{ __('Enter Email') }}" required="required">
+                        @error('email')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                        {{-- <div class="invalid-feedback">
+                            {{ __('Please fill in your email') }}
+                        </div> --}}
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="password" class="form-label">{{ __('Password') }}</label>
+                        <input id="password" type="password" data-indicator="pwindicator"
+                            class="form-control pwstrength @error('password') is-invalid @enderror" name="password"
+                            autocomplete="new-password" placeholder="{{ __('Enter Password') }}" required="required">
+                        @error('password')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                        <div id="pwindicator" class="pwindicator">
+                            <div class="bar"></div>
+                            <div class="label"></div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="password_confirmation" class="form-label">{{ __('Password Confirmation') }}</label>
+                        <input id="password_confirmation" type="password" data-indicator="password_confirmation"
+                            class="form-control pwstrength @error('password_confirmation') is-invalid @enderror"
+                            name="password_confirmation" autocomplete="new-password"
+                            placeholder="{{ __('Enter Confirm Password') }}" required="required">
+                        @error('password_confirmation')
+                            <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                        @enderror
+                        <div id="password_confirmation" class="pwindicator">
+                            <div class="bar"></div>
+                            <div class="label"></div>
+                        </div>
+                    </div>
+
+                    <!-- <div class="form-group mb-4">
+                        <div class="d-flex flex-wrap align-items-center justify-content-between">
+                            @if (Route::has('password.request'))
+                                <span>
+                                    <a href="{{ route('password.request', $lang) }}">{{ __('Forgot your password?') }}</a>
+                                </span>
+                            @endif
+                        </div>
+                    </div> -->
+
+                    @if ($settings['recaptcha_module'] == 'on')
+                        @if (isset($settings['google_recaptcha_version']) && $settings['google_recaptcha_version'] == 'v2-checkbox')
+                            <div class="form-group col-lg-12 col-md-12 mt-3">
+                                {!! NoCaptcha::display() !!}
+                                @error('g-recaptcha-response')
+                                    <span class="small text-danger" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        @else
+                            <div class="form-group col-lg-12 col-md-12 mt-3">
+                                <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response"
+                                    class="form-control">
+                                @error('g-recaptcha-response')
+                                    <span class="error small text-danger" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        @endif
+                    @endif
+
+                    <div class="d-grid">
+                        <input type="hidden" name="ref_code" value="{{ $ref }}">
+                        <button type="submit" class="btn btn-primary btn-block mt-2">{{ __('Register') }}</button>
+                    </div>
+
+                    <p class="my-4 text-center">{{ __('Already have an account?') }} <a href="{{ route('login', $lang) }}"
+                    class="text-primary">{{ __('Login') }}</a></p>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+    <!-- <div class="card-body">
         <div>
             <h2 class="mb-3 f-w-600">{{ __('Register') }}</h2>
         </div>
@@ -165,7 +295,7 @@
                     class="text-primary">{{ __('Login') }}</a></p>
         </form>
 
-    </div>
+    </div> -->
 @endsection
 @if (isset($settings['recaptcha_module']) && $settings['recaptcha_module'] == 'on')
     @if (isset($settings['google_recaptcha_version']) && $settings['google_recaptcha_version'] == 'v2-checkbox')
