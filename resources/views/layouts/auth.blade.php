@@ -118,7 +118,7 @@
 
     <style>
         :root {
-            --color-customColor: <?= $color ?>;
+            --color-customColor:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 <?php echo $color ?>;
         }
     </style>
 
@@ -127,6 +127,10 @@
     <link rel="stylesheet" href="{{ asset('assets/css/customizer.css') }}">
 
     <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('login_template/css/page-auth.css')}}">
+    <link rel="stylesheet" href="{{ asset('login_template/css/core.css')}}">
+    <link rel="stylesheet" href="{{ asset('login_template/css/iconify-icons.css')}}">
 
 </head>
 
@@ -189,11 +193,11 @@
                     </div>
                 </nav>
             </header>
-            <main class="custom-wrapper">
-                <div class="custom-row">
-                    <div class="card">
+            <main class="authentication-wrapper authentication-cover">
+                <div class="authentication-inner row m-0">
+                    <!-- <div class="card"> -->
                         @yield('content')
-                    </div>
+                    <!-- </div> -->
                 </div>
             </main>
             <footer>
