@@ -5,6 +5,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\BranchController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\Role\RoleController;
 use App\Http\Controllers\Settings\SettingsController;
 use App\Http\Controllers\Settings\SettingsContrpller;
 use App\Http\Controllers\HrmSystem\EmployeeController;
@@ -84,6 +85,9 @@ Route::group([
     Route::get('/userlogs', [UserController::class, 'userLog'])->name('user.userlog');
     Route::get('userlogs/{id}', [UserController::class, 'userLogView'])->name('user.userlogview');
     Route::delete('userlogs/{id}', [UserController::class, 'userLogDestroy'])->name('user.userlogdestroy');
+
+    // Role&Permission Routes
+    Route::resource('roles', RoleController::class);
 
 
 
