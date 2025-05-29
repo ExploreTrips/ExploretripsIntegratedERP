@@ -9,17 +9,13 @@
     <li class="breadcrumb-item">{{ __('Role') }}</li>
 @endsection
 @section('action-btn')
-<div class="float-end">
-    <a href="#"
-       data-size="lg"
-       data-url="{{ route('roles.create') }}"
-       data-ajax-popup="true"
-       class="btn btn-sm btn-primary d-flex align-items-center gap-2">
-        <i class="ti ti-plus"></i>
-        <span>{{ __('Create New Role') }}</span>
-    </a>
-</div>
-
+    <div class="float-end">
+        <a href="#" data-size="lg" data-url="{{ route('roles.create') }}" data-ajax-popup="true"
+            class="btn btn-sm btn-primary d-flex align-items-center gap-2">
+            <i class="ti ti-plus"></i>
+            <span>{{ __('Create New Role') }}</span>
+        </a>
+    </div>
 @endsection
 
 @section('content')
@@ -44,7 +40,8 @@
                                             <td class="Permission">
                                                 <div style="max-height: 150px; overflow-y: auto;">
                                                     @foreach ($role->permissions()->pluck('name') as $permissionName)
-                                                        <span class="badge rounded p-2 m-1 px-3 bg-primary">{{ $permissionName }}</span>
+                                                        <span
+                                                            class="badge rounded p-2 m-1 px-3 bg-primary">{{ $permissionName }}</span>
                                                     @endforeach
                                                 </div>
                                             </td>
@@ -53,8 +50,7 @@
                                                 <span>
                                                     @can('edit role')
                                                         <div class="action-btn me-2">
-                                                            <a href="#"
-                                                                class="mx-3 btn btn-sm align-items-center bg-info"
+                                                            <a href="#" class="mx-3 btn btn-sm align-items-center bg-info"
                                                                 data-url="{{ route('roles.edit', $role->id) }}"
                                                                 data-ajax-popup="true" data-size="lg" data-bs-toggle="tooltip"
                                                                 title="{{ __('Edit') }}"
@@ -63,18 +59,24 @@
                                                             </a>
                                                         </div>
                                                     @endcan
-
                                                     @if ($role->name != 'Employee')
                                                         @can('delete role')
                                                             <div class="action-btn ">
-                                                                <form method="POST" action="{{ route('roles.destroy', $role->id) }}" id="delete-form-{{ $role->id }}">
+                                                                <form method="POST"
+                                                                    action="{{ route('roles.destroy', $role->id) }}"
+                                                                    id="delete-form-{{ $role->id }}">
                                                                     @csrf
                                                                     @method('DELETE')
-                                                                    <button type="submit" class="mx-3 btn btn-sm align-items-center bg-danger" data-bs-toggle="tooltip" title="{{ __('Delete') }}">
-                                                                        <i class="ti ti-trash text-white"></i>
-                                                                    </button>
-                                                                </form>
 
+                                                                    <a href="#"
+                                                                        class="btn btn-sm align-items-center bs-pass-para bg-danger"
+                                                                        data-bs-toggle="tooltip" title="{{ __('Delete') }}"
+                                                                        data-original-title="{{ __('Delete') }}"
+                                                                        data-confirm="{{ __('Are You Sure?') . '|' . __('This action can not be undone. Do you want to continue?') }}"
+                                                                        data-confirm-yes="document.getElementById('delete-form-{{ $role->id }}').submit();">
+                                                                        <i class="ti ti-trash text-white"></i>
+                                                                    </a>
+                                                                </form>
                                                             </div>
                                                         @endcan
                                                     @endif

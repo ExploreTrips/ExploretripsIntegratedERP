@@ -6,6 +6,9 @@ use App\Http\Controllers\BranchController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Role\RoleController;
+use App\Http\Controllers\Client\CientController;
+use App\Http\Controllers\Client\ClientController;
+use App\Http\Controllers\HrmSystem\PayrollController;
 use App\Http\Controllers\Settings\SettingsController;
 use App\Http\Controllers\Settings\SettingsContrpller;
 use App\Http\Controllers\HrmSystem\EmployeeController;
@@ -88,6 +91,16 @@ Route::group([
 
     // Role&Permission Routes
     Route::resource('roles', RoleController::class);
+
+    // Client Routes
+    Route::resource('clients', ClientController::class);
+    Route::any('client-reset-password/{id}', [ClientController::class, 'clientPassword'])->name('clients.reset');
+    Route::post('client-reset-password/{id}', [ClientController::class, 'clientPasswordReset'])->name('client.password.update');
+
+    // Payroll Routes
+    Route::resource('setsalary', PayrollController::class);
+
+
 
 
 

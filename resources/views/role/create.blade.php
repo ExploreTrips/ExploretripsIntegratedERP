@@ -290,7 +290,7 @@
                                                     <div class="form-check d-flex align-items-center gap-2">
                                                         <input type="checkbox" class="form-check-input"
                                                             name="project_checkall" id="project_checkall">
-                                                        <label for="staff_checkall" class="form-check-label mb-0">
+                                                        <label for="project_checkall" class="form-check-label mb-0">
                                                             {{ __('Select All') }}
                                                         </label>
                                                     </div>
@@ -301,26 +301,28 @@
                                         </thead>
                                         <tbody>
                                             @foreach ($modules as $module)
+                                                @php $moduleKey = str_replace(' ', '', $module); @endphp
+
                                                 <tr>
                                                     <td>
                                                         <input type="checkbox"
                                                             class="form-check-input align-middle ischeck project_checkall"
-                                                            data-id="{{ str_replace(' ', '', $module) }}">
+                                                            data-id="{{$moduleKey}}">
                                                     </td>
                                                     <td>
                                                         <label class="ischeck project_checkall"
-                                                            data-id="{{ str_replace(' ', '', $module) }}">{{ ucfirst($module) }}</label>
+                                                            data-id="{{ $moduleKey }}">{{ ucfirst($module) }}</label>
                                                     </td>
                                                     <td>
                                                         <div class="row">
                                                             @foreach ($permissionTypes as $prefix => $label)
                                                                 @php
-                                                                    $permKey = array_search(
+                                                                    $key = array_search(
                                                                         $prefix . ' ' . $module,
                                                                         $permissions,
                                                                     );
                                                                 @endphp
-                                                                @if ($permKey !== false)
+                                                                @if ($key !== false)
                                                                     <div
                                                                         class="col-md-3 custom-control custom-checkbox">
                                                                         <input type="checkbox" name="permissions[]"
@@ -476,7 +478,7 @@
                                                                         <input type="checkbox" name="permissions[]"
                                                                             value="{{ $key }}"
                                                                             id="permission{{ $key }}"
-                                                                            class="form-check-input isscheck hrm_checkall isscheck_{{ $moduleKey }}">
+                                                                            class="form-check-input isscheck hrm_checkall isscheck_{{ str_replace(' ', '', $module) }}">
                                                                         <label for="permission{{ $key }}"
                                                                             class="custom-control-label">{{ $label }}</label><br>
                                                                     </div>
