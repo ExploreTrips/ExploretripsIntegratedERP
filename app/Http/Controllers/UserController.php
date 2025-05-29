@@ -115,7 +115,6 @@ class UserController extends Controller
             $user->is_enable_login = $enableLogin;
             $user->avatar = $avatarPath;
             $user->save();
-
             $role_r = Role::findByName('company');
             $user->assignRole($role_r);
         } else {
@@ -179,15 +178,12 @@ class UserController extends Controller
                 if (!empty($resp) && $resp['is_success'] == false && !empty($resp['error'])) {
                     $successMsg .= '<br> <span class="text-danger">' . $resp['error'] . '</span>';
                 }
-
                 return redirect()->route('users.index')->with('success', $successMsg);
             }
-
             return redirect()->route('users.index')->with('success', auth()->user()->type == 'super admin'
                 ? __('Company successfully created.')
                 : __('User successfully created.'));
         }
-
         return redirect()->back()->with('error', __('Something went wrong while creating user.'));
     }
 
@@ -364,8 +360,10 @@ class UserController extends Controller
 
     public function LoginManage($id)
     {
-        // $eId = \Crypt::decrypt($id);
-        $user = User::find($id);
+        $eId = Crypt::decrypt($id);
+        // echo $eId;die;
+        $user = User::find($eId);
+        // dd($user);
         $authUser = \Auth::user();
 
         if ($user->is_enable_login == 1) {

@@ -301,6 +301,29 @@
                                     </li>
                                 @endcan
 
+                                     @if (Gate::check('manage set salary') || Gate::check('manage pay slip'))
+                                    <li
+                                        class="dash-item dash-hasmenu  {{ Request::segment(1) == 'setsalary' || Request::segment(1) == 'payslip' ? 'active dash-trigger' : '' }}">
+                                        <a class="dash-link" href="#">{{ __('Payroll Setup') }}<span
+                                                class="dash-arrow"><i data-feather="chevron-right"></i></span></a>
+                                        <ul class="dash-submenu">
+                                            @can('manage set salary')
+                                                <li
+                                                    class="dash-item {{ request()->is('setsalary*') ? 'active' : '' }}">
+                                                    <a class="dash-link"
+                                                        href="#">{{ __('Set salary') }}</a>
+                                                </li>
+                                            @endcan
+                                            @can('manage pay slip')
+                                                <li class="dash-item {{ request()->is('payslip*') ? 'active' : '' }}">
+                                                    <a class="dash-link"
+                                                        href="#">{{ __('Payslip') }}</a>
+                                                </li>
+                                            @endcan
+                                        </ul>
+                                    </li>
+                                @endif
+
 
                         </ul>
                     </li>
@@ -350,11 +373,10 @@
                             <a class="dash-link" href="{{ route('roles.index') }}">{{ __('Role') }}</a>
                         </li>
                         @endcan
-
                         @can('manage client')
                             <li
                                 class="dash-item {{ Request::route()->getName() == 'clients.index' || Request::segment(1) == 'clients' || Request::route()->getName() == 'clients.edit' ? ' active' : '' }}">
-                                <a class="dash-link" href="#">{{ __('Client') }}</a>
+                                <a class="dash-link" href="{{route('clients.index')}}">{{ __('Client') }}</a>
                             </li>
                         @endcan
                         {{--                                    @can('manage user') --}}

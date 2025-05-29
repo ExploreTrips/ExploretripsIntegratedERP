@@ -101,19 +101,52 @@ class RoleController extends Controller
         return redirect()->back()->with('error', 'Permission denied.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Role $role)
     {
-        //
+        if(\Auth::user()->can('edit role'))
+        {
+            $validator = \Validator::make(
+                $request->all(), [
+                                   'name' => 'required|max:100|unique:roles,name,' . $role['id'] . ',id,created_by,' . \Auth::user()->creatorId(),
+                                   'permissions' => 'required',
+                               ]
+            );
+            if($validator->fails())
+            {
+                $messages = $validator->getMessageBag();
+                return redirect()->back()->with('error', $messages->first());
+            }
+            $input       = $request->except(['permissions']);
+            $permissions = $request['permissions'];
+            $role->fill($input)->save();
+            $p_all = Permission::all();
+            foreach($p_all as $p)
+            {
+                $role->revokePermissionTo($p);
+            }
+            foreach($permissions as $permission)
+            {
+                $p = Permission::where('id', '=', $permission)->firstOrFail();
+                $role->givePermissionTo($p);
+            }
+            return redirect()->route('roles.index')->with('success' , 'Role ' . $role->name . ' successfully updated.');
+        }
+        else
+        {
+            return redirect()->back()->with('error', 'Permission denied.');
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Role $role)
     {
-        //
+        if(Auth::user()->can('delete role'))
+        {
+            $role->delete();
+            return redirect()->route('roles.index')->with('success', __('Role '.$role->name.' successfully deleted.'));
+        }
+        else
+        {
+            return redirect()->back()->with('error', 'Permission denied.');
+        }
     }
 }
