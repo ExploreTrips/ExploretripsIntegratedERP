@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\User;
 use App\Models\Branch;
 use App\Models\Documents;
+use App\Models\Allowances;
 use App\Models\Department;
 use App\Models\Designation;
 use App\Models\EmployeeDocument;
@@ -63,10 +64,72 @@ class Employees extends Model
 
     public function documents()
     {
-
         $documents= $this->hasMany(EmployeeDocument::class, 'employee_id', 'id');
         // echo($documents);die;
         return $documents;
     }
+
+    public function salaryType()
+    {
+        $salrytypes = $this->belongsTo('App\Models\PayslipTypes', 'salary_type', 'id');
+        // echo $salrytypes;die;
+        return $salrytypes;
+    }
+
+    public function allowances()
+    {
+        return $this->hasMany(Allowances::class,'employee_id');
+    }
+
+    public function get_net_salary()
+    {
+        // Calculate total allowances
+        $totalAllowance = $this->allowances->sum(function ($item) {
+            return $item->type === 'fixed'
+                ? $item->amount
+                : ($item->amount * $this->salary / 100);
+        });
+        // Calculate total commissions
+        // $totalCommission = $this->commissions->sum(function ($item) {
+        //     return $item->type === 'fixed'
+        //         ? $item->amount
+        //         : ($item->amount * $this->salary / 100);
+        // });
+        // // Calculate total loans
+        // $totalLoan = $this->loans->sum(function ($item) {
+        //     return $item->type === 'fixed'
+        //         ? $item->amount
+        //         : ($item->amount * $this->salary / 100);
+        // });
+        // // Calculate total saturation deductions
+        // $totalDeduction = $this->saturationDeductions->sum(function ($item) {
+        //     return $item->type === 'fixed'
+        //         ? $item->amount
+        //         : ($item->amount * $this->salary / 100);
+        // });
+        // // Calculate total other payments
+        // $totalOtherPayment = $this->otherPayments->sum(function ($item) {
+        //     return $item->type === 'fixed'
+        //         ? $item->amount
+        //         : ($item->amount * $this->salary / 100);
+        // });
+        // // Calculate total overtime
+        // $totalOvertime = $this->overtimes->sum(function ($item) {
+        //     return $item->number_of_days * $item->hours * $item->rate;
+        // });
+
+        // Final net salary calculation
+        $netSalary = $this->salary
+            + $totalAllowance;
+            // + $totalCommission
+            // + $totalOtherPayment
+            // + $totalOvertime
+            // - $totalLoan
+            // - $totalDeduction;
+
+        return $netSalary;
+    }
+
+
 
 }

@@ -311,7 +311,7 @@
                                                 <li
                                                     class="dash-item {{ request()->is('setsalary*') ? 'active' : '' }}">
                                                     <a class="dash-link"
-                                                        href="#">{{ __('Set salary') }}</a>
+                                                        href="{{ route('setsalary.index') }}">{{ __('Set salary') }}</a>
                                                 </li>
                                             @endcan
                                             @can('manage pay slip')
