@@ -13,6 +13,8 @@ use App\Http\Controllers\Settings\SettingsController;
 use App\Http\Controllers\Settings\SettingsContrpller;
 use App\Http\Controllers\HrmSystem\EmployeeController;
 use App\Http\Controllers\Dashboard\DashboardController;
+use App\Http\Controllers\HrmSystem\PayslipTypeController;
+use App\Http\Controllers\HrmSystem\HrmSystemSetup\AllowanceOptionController;
 
 
 
@@ -67,6 +69,10 @@ Route::group([
     Route::get('test-mail', [SettingsController::class, 'mailTest'])->name('test.mail');
     // Route::post('test-mail/send', [SettingsController::class, 'testSendMail'])->name('test.send.mail');
 
+    // Payment Settings Routes
+    Route::post('stripe-settings', [SettingsController::class, 'savePaymentSettings'])->name('payment.settings');
+
+
 
     // Template Routes
     Route::get('email_template_lang/{id}/{lang?}', [MailController::class, 'manageEmailLang'])->name('manage.email.language');
@@ -83,6 +89,10 @@ Route::group([
     // HrmSystem Setup Routes
     Route::resource('branch', BranchController::class);
     Route::resource('document', DocumentController::class);
+    Route::resource('paysliptype', PayslipTypeController::class);
+    Route::resource('allowanceoption', AllowanceOptionController::class);
+
+
 
     // UserLogHistory Routes
     Route::get('/userlogs', [UserController::class, 'userLog'])->name('user.userlog');
@@ -99,6 +109,10 @@ Route::group([
 
     // Payroll Routes
     Route::resource('setsalary', PayrollController::class);
+
+    // Payment Settings
+
+
 
 
 

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Auth;
 use Carbon\Carbon;
 use App\Models\User;
 use Twilio\Rest\Client;
@@ -14,6 +13,7 @@ use App\Mail\CommonEmailTemplate;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use App\Models\ReferralTransaction;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
@@ -3489,22 +3489,17 @@ class Utility extends Model
 
     public static function getAdminPaymentSetting()
     {
-
-        // $data = \DB::table('admin_payment_settings');
-
-        // $settings = [];
-        // if (\Auth::check()) {
-
-        //     $user_id = 1;
-        //     $data = $data->where('created_by', '=', $user_id);
-
-        // }
-        // $data = $data->get();
-        // foreach ($data as $row) {
-        //     $settings[$row->name] = $row->value;
-        // }
-
-        // return $settings;
+        $data = DB::table('admin_payment_settings');
+        $settings = [];
+        if (Auth::check() && Auth::user()->type === 'super admin') {
+            $user_id = Auth::user()->id;
+            $data = $data->where('created_by', $user_id);
+        }
+        $data = $data->get();
+        foreach ($data as $row) {
+            $settings[$row->name] = $row->value;
+        }
+        return $settings;
     }
 
     public static function getCompanyPaymentSetting($user_id)

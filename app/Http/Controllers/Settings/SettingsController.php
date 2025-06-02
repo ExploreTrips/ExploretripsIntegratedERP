@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Settings;
+use Validator;
 use App\Models\Utility;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -17,14 +18,14 @@ class SettingsController extends Controller
     {
         if (\Auth::user()->can('manage system settings')) {
             $settings = Utility::settings();
-            // $admin_payment_setting = Utility::getAdminPaymentSetting();
+            $admin_payment_setting = Utility::getAdminPaymentSetting();
             // // $emailSetting = Utility::settingsById(\Auth::user()->id);
             // $file_size = 0;
             // foreach (\File::allFiles(storage_path('/framework')) as $file) {
             //     $file_size += $file->getSize();
             // }
             // $file_size = number_format($file_size / 1000000, 4);
-            return view('settings.index',compact('settings'));
+            return view('settings.index',compact('settings','admin_payment_setting'));
         } else {
             return redirect()->back()->with('error', 'Permission denied.');
         }
@@ -37,10 +38,6 @@ class SettingsController extends Controller
     {
         //
     }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
 
@@ -298,4 +295,147 @@ class SettingsController extends Controller
     {
         //
     }
+
+    public function savePaymentSettings(Request $request)
+    {
+        if (!Auth::user()->can('manage stripe settings')) {
+            return redirect()->back()->with('error', __('Permission denied.'));
+        }
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'currency' => 'required|string|max:255',
+                'currency_symbol' => 'required|string|max:255',
+            ]
+        );
+
+        if ($validator->fails()) {
+            return redirect()->back()->with('error', $validator->errors()->first());
+        }
+        $this->adminPaymentSettings($request);
+        return redirect()->back()->with('success', __('Payment settings successfully updated.'));
+    }
+
+    public function adminPaymentSettings($request)
+    {
+        $post['currency'] = $request->currency;
+        $post['currency_symbol'] = $request->currency_symbol;
+        if (isset($request->is_manually_payment_enabled) && $request->is_manually_payment_enabled == 'on') {
+
+            $post['is_manually_payment_enabled'] = $request->is_manually_payment_enabled;
+        } else {
+            $post['is_manually_payment_enabled'] = 'off';
+        }
+        if (isset($request->is_bank_transfer_enabled) && $request->is_bank_transfer_enabled == 'on') {
+
+            $request->validate(
+                [
+                    'bank_details' => 'required|string',
+                ]
+            );
+            $post['is_bank_transfer_enabled'] = $request->is_bank_transfer_enabled;
+            $post['bank_details'] = $request->bank_details;
+        } else {
+            $post['is_bank_transfer_enabled'] = 'off';
+        }
+
+        if (isset($request->is_stripe_enabled) && $request->is_stripe_enabled == 'on') {
+            $request->validate(
+                [
+                    'stripe_key' => 'required|string|max:255',
+                    'stripe_secret' => 'required|string|max:255',
+                ]
+            );
+            $post['is_stripe_enabled'] = $request->is_stripe_enabled;
+            $post['stripe_secret'] = $request->stripe_secret;
+            $post['stripe_key'] = $request->stripe_key;
+        } else {
+            $post['is_stripe_enabled'] = 'off';
+        }
+        if (isset($request->is_paypal_enabled) && $request->is_paypal_enabled == 'on') {
+            $request->validate(
+                [
+                    'paypal_mode' => 'required',
+                    'paypal_client_id' => 'required',
+                    'paypal_secret_key' => 'required',
+                ]
+            );
+
+            $post['is_paypal_enabled'] = $request->is_paypal_enabled;
+            $post['paypal_mode'] = $request->paypal_mode;
+            $post['paypal_client_id'] = $request->paypal_client_id;
+            $post['paypal_secret_key'] = $request->paypal_secret_key;
+        } else {
+            $post['is_paypal_enabled'] = 'off';
+        }
+        if (isset($request->is_razorpay_enabled) && $request->is_razorpay_enabled == 'on') {
+            $request->validate(
+                [
+                    'razorpay_public_key' => 'required|string',
+                    'razorpay_secret_key' => 'required|string',
+                ]
+            );
+            $post['is_razorpay_enabled'] = $request->is_razorpay_enabled;
+            $post['razorpay_public_key'] = $request->razorpay_public_key;
+            $post['razorpay_secret_key'] = $request->razorpay_secret_key;
+        } else {
+            $post['is_razorpay_enabled'] = 'off';
+        }
+
+        if (isset($request->is_paytm_enabled) && $request->is_paytm_enabled == 'on') {
+            $request->validate([
+                'paytm_mode' => 'required',
+                'paytm_merchant_id' => 'required|string',
+                'paytm_merchant_key' => 'required|string',
+                'paytm_industry_type' => 'required|string',
+            ]);
+            $post['is_paytm_enabled'] = $request->is_paytm_enabled;
+            $post['paytm_mode'] = $request->paytm_mode;
+            $post['paytm_merchant_id'] = $request->paytm_merchant_id;
+            $post['paytm_merchant_key'] = $request->paytm_merchant_key;
+            $post['paytm_industry_type'] = $request->paytm_industry_type;
+        } else {
+            $post['is_paytm_enabled'] = 'off';
+        }
+
+        if (isset($request->is_skrill_enabled) && $request->is_skrill_enabled == 'on') {
+            $request->validate(
+                [
+                    'skrill_email' => 'required|email',
+                ]
+            );
+            $post['is_skrill_enabled'] = $request->is_skrill_enabled;
+            $post['skrill_email'] = $request->skrill_email;
+        } else {
+            $post['is_skrill_enabled'] = 'off';
+        }
+
+        if (isset($request->is_coingate_enabled) && $request->is_coingate_enabled == 'on') {
+            $request->validate(
+                [
+                    'coingate_mode' => 'required|string',
+                    'coingate_auth_token' => 'required|string',
+                ]
+            );
+
+            $post['is_coingate_enabled'] = $request->is_coingate_enabled;
+            $post['coingate_mode'] = $request->coingate_mode;
+            $post['coingate_auth_token'] = $request->coingate_auth_token;
+        } else {
+            $post['is_coingate_enabled'] = 'off';
+        }
+        foreach ($post as $key => $data) {
+
+            $arr = [
+                $data,
+                $key,
+                \Auth::user()->id,
+            ];
+            \DB::insert(
+                'insert into admin_payment_settings (`value`, `name`,`created_by`) values (?, ?, ?) ON DUPLICATE KEY UPDATE `value` = VALUES(`value`) ',
+                $arr
+            );
+        }
+    }
+
 }

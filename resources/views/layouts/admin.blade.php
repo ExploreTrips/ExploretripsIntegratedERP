@@ -8,11 +8,9 @@
 
     $color = !empty($setting['color']) ? $setting['color'] : 'theme-3';
 
-    if(isset($setting['color_flag']) && $setting['color_flag'] == 'true')
-    {
+    if (isset($setting['color_flag']) && $setting['color_flag'] == 'true') {
         $themeColor = 'custom-color';
-    }
-    else {
+    } else {
         $themeColor = $color;
     }
 
@@ -69,7 +67,7 @@
         type="image" sizes="16x16">
 
     <!-- Favicon icon -->
-       {{-- <link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon"/> --}}
+    {{-- <link rel="icon" href="{{ asset('assets/images/favicon.svg') }}" type="image/x-icon"/> --}}
     <!-- Calendar-->
     <link rel="stylesheet" href="{{ asset('assets/css/plugins/main.css') }}">
 
@@ -78,6 +76,10 @@
 
     <link rel="stylesheet" href="{{ asset('assets/css/plugins/animate.min.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
 
 
     <!-- font css -->
@@ -107,28 +109,29 @@
     <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     @if ($setting['cust_darklayout'] == 'on')
         <link rel="stylesheet" href="{{ asset('css/custom-dark.css') }}">
     @endif
 
     <style>
         :root {
-            --color-customColor: <?= $color ?>;
+            --color-customColor: <?=$color ?>;
         }
 
         .bg-light {
-    background: linear-gradient(135deg, #ffe5ec 0%, #ffcad4 100%);
-    position: relative;
+            background: linear-gradient(135deg, #ffe5ec 0%, #ffcad4 100%);
+            position: relative;
         }
 
-    .paid-users-badge {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-}
-
-
-
+        .paid-users-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
     </style>
 
     <link rel="stylesheet" href="{{ asset('css/custom-color.css') }}">
@@ -137,7 +140,7 @@
 
 
 
-<body class="{{$themeColor}}">
+<body class="{{ $themeColor }}">
 
     <!-- [ Pre-loader ] start -->
     <div class="loader-bg">
@@ -164,7 +167,8 @@
                     <hr />
                     <div class="form-check form-switch">
                         <input type="checkbox" class="form-check-input" id="pcsetting1" checked />
-                        <label class="form-check-label f-w-600 pl-1" for="pcsetting1">Allow desktop notification</label>
+                        <label class="form-check-label f-w-600 pl-1" for="pcsetting1">Allow desktop
+                            notification</label>
                     </div>
                     <p class="text-muted ms-5">
                         you get lettest content at a time when data will updated
