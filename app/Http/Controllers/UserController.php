@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Lab404\Impersonate\Impersonate;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -239,23 +240,32 @@ class UserController extends Controller
 
         $input['type'] = $role->name;
         if ($request->hasFile('avatar')) {
-            if ($user->avatar && \Storage::disk('public')->exists($user->avatar)) {
-                \Storage::disk('public')->delete($user->avatar);
-            }
-
             $file = $request->file('avatar');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $avatarPath = $file->storeAs('avatars', $filename, 'public');
-            $input['avatar'] = $avatarPath;
+            $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $fileNameToStore = $filename . '_' . time() . '.' . $extension;
+            // print_r($fileNameToStore);die;
+            $dir = 'avatars';
+            $storageDisk = 'public';
+
+        if (!empty($user->avatar)) {
+            $oldPath = $dir . '/' . $user->avatar;
+            if (Storage::disk($storageDisk)->exists($oldPath)) {
+                Storage::disk($storageDisk)->delete($oldPath);
+            }
         }
+        $path = $file->storeAs($dir, $fileNameToStore, $storageDisk);
+        $user->avatar = $fileNameToStore;
+    }
 
-        $user->fill($input)->save();
-        $user->roles()->sync([$role->id]);
+    $user->name = $input['name'];
+    $user->email = $input['email'];
+    $user->type = $input['type'];
 
+    $user->save();
         if ($request->has('customField')) {
             CustomField::saveData($user, $request->customField);
         }
-
         if (\Auth::user()->type !== 'super admin') {
             Utility::employeeDetailsUpdate($user->id, \Auth::user()->creatorId());
         }
@@ -327,7 +337,6 @@ class UserController extends Controller
         if ($id == 2) {
             return redirect()->back()->with('error', __('You cannot delete the default company.'));
         }
-
         $user = User::find($id);
         if (!$user) {
             return redirect()->back()->with('error', __('User not found.'));
@@ -437,6 +446,77 @@ class UserController extends Controller
         // dd($users);
         return redirect()->back()->with('success', 'User successfully deleted.');
     }
+
+    public function profile()
+    {
+        $userDetail = Auth::user();
+        return view('user.profile', compact('userDetail'));
+    }
+
+    public function editprofile(Request $request)
+    {
+        $userDetail = Auth::user();
+        $user = User::findOrFail($userDetail->id);
+        $validator = \Validator::make($request->all(), [
+            'name' => 'required|max:120',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+        ]);
+        if ($validator->fails()) {
+            return redirect()->back()->with('error', $validator->errors()->first());
+        }
+
+        if ($request->hasFile('profile')) {
+            $file = $request->file('profile');
+            $filename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $fileNameToStore = $filename . '_' . time() . '.' . $extension;
+
+            $dir = 'avatars';
+            $storageDisk = 'public';
+            if (!empty($user->avatar)) {
+                $oldPath = $dir . '/' . $user->avatar;
+                if (Storage::disk($storageDisk)->exists($oldPath)) {
+                    Storage::disk($storageDisk)->delete($oldPath);
+                }
+            }
+            $path = $file->storeAs($dir, $fileNameToStore, $storageDisk);
+            $user->avatar = $fileNameToStore;
+        }
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->save();
+        return redirect()->route('profile')->with('success', 'Profile successfully updated.');
+    }
+
+    public function updatePassword(Request $request)
+    {
+        if (!Auth::check()) {
+            return redirect()->route('profile', Auth::id())->with('error', __('Something is wrong.'));
+        }
+
+        $request->validate([
+            'old_password' => 'required',
+            'password' => 'required|min:6|confirmed',
+        ], [
+            'password.confirmed' => 'The password confirmation does not match.',
+        ]);
+
+        $user = Auth::user();
+        if (!Hash::check($request->old_password, $user->password)) {
+            return redirect()->route('profile', $user->id)->with('error', __('Please enter the correct current password.'));
+        }
+        $user->password = Hash::make($request->password);
+        $user->save();
+        return redirect()->route('profile', $user->id)->with('success', __('Password successfully updated.'));
+    }
+
+
+
+
+
+
+
+
 
 
 

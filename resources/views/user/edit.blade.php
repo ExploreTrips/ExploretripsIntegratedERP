@@ -1,11 +1,13 @@
-<form action="{{ route('users.update', $user->id) }}" method="POST" class="needs-validation" novalidate enctype="multipart/form-data">
+@php
+    $avatars = \App\Models\Utility::get_file('avatars/');
+@endphp
+<form action="{{ route('users.update', $user->id) }}" method="POST" class="needs-validation" novalidate
+    enctype="multipart/form-data">
     @csrf
     @method('PUT')
 
     <div class="container">
-        {{-- Row 1: Name & Email --}}
         <div class="row justify-content-center mt-4">
-            {{-- Name --}}
             <div class="col-md-5">
                 <div class="form-group">
                     <label for="name" class="form-label">{{ __('Name') }} <x-required /></label>
@@ -17,7 +19,6 @@
                 </div>
             </div>
 
-            {{-- Email --}}
             <div class="col-md-5">
                 <div class="form-group">
                     <label for="email" class="form-label">{{ __('Email') }} <x-required /></label>
@@ -31,14 +32,15 @@
         </div>
 
         {{-- Role --}}
-        @if(Auth::user()->type != 'super admin')
+        @if (Auth::user()->type != 'super admin')
             <div class="row justify-content-center mt-4">
                 <div class="col-md-5">
                     <div class="form-group">
                         <label for="role" class="form-label">{{ __('User Role') }} <x-required /></label>
                         <select name="role" id="role" class="form-control select" required>
-                            @foreach($roles as $id => $roleName)
-                                <option value="{{ $id }}" {{ in_array($id, $user->roles->pluck('id')->toArray()) ? 'selected' : '' }}>
+                            @foreach ($roles as $id => $roleName)
+                                <option value="{{ $id }}"
+                                    {{ in_array($id, $user->roles->pluck('id')->toArray()) ? 'selected' : '' }}>
                                     {{ $roleName }}
                                 </option>
                             @endforeach
@@ -51,11 +53,13 @@
                 <div class="col-md-5">
                     <div class="form-group">
                         <label for="avatar" class="form-label">{{ __('Profile Image') }}</label>
-                        <input type="file" name="avatar" id="avatar" class="form-control" onchange="previewAvatar(event)">
-                        @if($user->avatar)
+                        <input type="file" name="avatar" id="avatar" class="form-control"
+                            onchange="previewAvatar(event)">
+                        @if ($user->avatar)
                             <div class="mt-2">
-                                <img src="{{ asset('storage/' . $user->avatar) }}" id="avatar-preview" alt="avatar" width="120"  height='120' class="rounded border">
-                                {{-- <img id="avatar-preview" src="#" alt="Avatar Preview" style="display:none; margin-top:10px; max-height: 100px;" /> --}}
+                                <img src="{{ !empty($user->avatar) ? $avatars . $user->avatar : $avatars . 'avatar.png' }}"
+                                    alt="user-image" id="avatar-preview" alt="avatar" width="120" height='120'
+                                    class="rounded border">
                             </div>
                         @endif
                         @error('avatar')
@@ -83,7 +87,7 @@
 
 
         {{-- Custom Fields --}}
-        @if(!$customFields->isEmpty())
+        @if (!$customFields->isEmpty())
             <div class="row justify-content-center mt-3">
                 <div class="col-md-10">
                     @include('customFields.formBuilder')

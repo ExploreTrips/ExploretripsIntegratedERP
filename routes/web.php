@@ -14,25 +14,9 @@ use App\Http\Controllers\Settings\SettingsContrpller;
 use App\Http\Controllers\HrmSystem\EmployeeController;
 use App\Http\Controllers\Dashboard\DashboardController;
 use App\Http\Controllers\HrmSystem\PayslipTypeController;
+use App\Http\Controllers\Settings\CookieSettingsController;
+use App\Http\Controllers\Settings\StorageSettingsController;
 use App\Http\Controllers\HrmSystem\HrmSystemSetup\AllowanceOptionController;
-
-
-
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
- */
-
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
 
 
 require __DIR__ . '/auth.php';
@@ -60,8 +44,12 @@ Route::group([
     Route::any('user-reset-password/{id}', [UserController::class, 'userPassword'])->name('users.reset');
     Route::post('user-reset-password/{id}', [UserController::class, 'userPasswordReset'])->name('user.password.update');
     Route::get('user-login/{id}', [UserController::class, 'LoginManage'])->name('users.login');
+    Route::get('profile', [UserController::class, 'profile'])->name('profile');
+    Route::post('edit-profile', [UserController::class, 'editprofile'])->name('update.account');
+    Route::post('change-password', [UserController::class, 'updatePassword'])->name('update.password');
 
-    // SystemController Routes
+
+    // SettingsController Routes
     Route::resource('systems', SettingsController::class);
 
     // MailConfiguration Settings
@@ -72,10 +60,13 @@ Route::group([
     // Payment Settings Routes
     Route::post('stripe-settings', [SettingsController::class, 'savePaymentSettings'])->name('payment.settings');
 
-
-
     // Template Routes
     Route::get('email_template_lang/{id}/{lang?}', [MailController::class, 'manageEmailLang'])->name('manage.email.language');
+
+    // StorageSettings Routes
+    Route::post('storage-settings', [StorageSettingsController::class, 'storageSettingStore'])->name('storage.setting.store');
+    Route::post('cookie-setting', [CookieSettingsController::class, 'saveCookieSettings'])->name('cookie.setting');
+
 
     // EmployeeController Routes
     Route::resource('employee', EmployeeController::class);
@@ -85,14 +76,11 @@ Route::group([
     Route::get('import/employee/file', [EmployeeController::class, 'fileImport'])->name('employee.file.import');
     Route::get('import/employee/modal', [EmployeeController::class, 'fileImportModal'])->name('employee.import.modal');
 
-
     // HrmSystem Setup Routes
     Route::resource('branch', BranchController::class);
     Route::resource('document', DocumentController::class);
     Route::resource('paysliptype', PayslipTypeController::class);
     Route::resource('allowanceoption', AllowanceOptionController::class);
-
-
 
     // UserLogHistory Routes
     Route::get('/userlogs', [UserController::class, 'userLog'])->name('user.userlog');
@@ -106,31 +94,16 @@ Route::group([
     Route::resource('clients', ClientController::class);
     Route::any('client-reset-password/{id}', [ClientController::class, 'clientPassword'])->name('clients.reset');
     Route::post('client-reset-password/{id}', [ClientController::class, 'clientPasswordReset'])->name('client.password.update');
-
     // Payroll Routes
     Route::resource('setsalary', PayrollController::class);
-
     // Payment Settings
-
-
-
-
-
-
 
 });
 
-// cache
-Route::get('/config-cache', function () {
-    Artisan::call('cache:clear');
-    Artisan::call('route:clear');
-    Artisan::call('view:clear');
-    Artisan::call('optimize:clear');
-    return redirect()->back()->with('success', 'Cache Clear Successfully');
-})->name('config.cache');
+Route::any('/cookie-consent', [CookieSettingsController::class, 'CookieConsent'])->name('cookie-consent');
 
 
 
 
 
-Route::any('/cookie-consent', [SystemController::class, 'CookieConsent'])->name('cookie-consent');
+

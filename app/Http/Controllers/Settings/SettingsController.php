@@ -40,7 +40,6 @@ class SettingsController extends Controller
     }
     public function store(Request $request)
     {
-
         if (Auth::user()->can('manage system settings')) {
             if ($request->hasFile('logo_dark')) {
                 $logoName = 'logo-dark.png';
@@ -60,8 +59,6 @@ class SettingsController extends Controller
                     return redirect()->back()->with('error', 'Failed to upload logo.');
                 }
             }
-
-
             if ($request->hasFile('logo_light')) {
                 $logoName = 'logo-light.png';
                 $dir = 'uploads/logo';
@@ -69,11 +66,8 @@ class SettingsController extends Controller
                 $validation = [
                     'logo_light' => 'mimes:png|max:20480',
                 ];
-
                 $request->validate($validation);
-
                 $path = $request->file('logo_light')->storeAs($dir, $logoName, 'public');
-
                 if ($path) {
                     $logo = 'storage/' . $path;
                 } else {
@@ -90,9 +84,7 @@ class SettingsController extends Controller
                 ];
 
                 $request->validate($validation);
-
                 $path = $request->file('favicon')->storeAs($dir, $favicon, 'public');
-
                 if ($path) {
                     $logo = 'storage/' . $path;
                 } else {
@@ -106,7 +98,6 @@ class SettingsController extends Controller
                 || isset($request->color) || !empty($request->cust_theme_bg) || !empty($request->cust_darklayout)
             ) {
                 $post = $request->all();
-
                 $SITE_RTL = $request->has('SITE_RTL') ? $request->SITE_RTL : 'off';
                 $post['SITE_RTL'] = $SITE_RTL;
 

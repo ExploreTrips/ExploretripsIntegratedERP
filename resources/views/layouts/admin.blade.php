@@ -2,20 +2,16 @@
     use App\Models\Utility;
     $setting = \App\Models\Utility::settings();
 
-    $logo = \App\Models\Utility::get_file('uploads/logo');
-
+    // $logo = \App\Models\Utility::get_file('uploads/logo');
+    $logo = Storage::url('uploads/logo');
     $company_favicon = $setting['company_favicon'] ?? '';
-
     $color = !empty($setting['color']) ? $setting['color'] : 'theme-3';
-
     if (isset($setting['color_flag']) && $setting['color_flag'] == 'true') {
         $themeColor = 'custom-color';
     } else {
         $themeColor = $color;
     }
-
     $SITE_RTL = $setting['SITE_RTL'] ?? '';
-
     $lang = \App::getLocale('lang');
     if ($lang == 'ar' || $lang == 'he') {
         $SITE_RTL = 'on';
@@ -137,8 +133,6 @@
     <link rel="stylesheet" href="{{ asset('css/custom-color.css') }}">
     @stack('css-page')
 </head>
-
-
 
 <body class="{{ $themeColor }}">
 

@@ -181,6 +181,15 @@ class Utility extends Model
             "wasabi_max_upload_size" => "",
             "wasabi_storage_validation" => "",
 
+            // ✅ Google Drive Settings
+
+            // "google_drive_client_id" => "",
+            // "google_drive_client_secret" => "",
+            // "google_drive_refresh_token" => "",
+            // "google_drive_folder_id" => "",
+            // "google_drive_max_upload_size" => "",
+            // "google_drive_storage_validation" => "",
+
             "purchase_logo" => "",
             "proposal_logo" => "",
             "invoice_logo" => "",
@@ -4023,12 +4032,8 @@ class Utility extends Model
     {
         try {
             $settings = Utility::getStorageSetting();
-//                dd($settings);
-
             if (!empty($settings['storage_setting'])) {
-
                 if ($settings['storage_setting'] == 'wasabi') {
-
                     config(
                         [
                             'filesystems.disks.wasabi.key' => $settings['wasabi_key'],
@@ -4056,65 +4061,45 @@ class Utility extends Model
                     $mimes = !empty($settings['s3_storage_validation']) ? $settings['s3_storage_validation'] : '';
 
                 } else {
-
                     $max_size = !empty($settings['local_storage_max_upload_size']) ? $settings['local_storage_max_upload_size'] : '20480000000';
-
                     $mimes = !empty($settings['local_storage_validation']) ? $settings['local_storage_validation'] : '';
                 }
-
                 $file = $request->$key_name;
-
                 if (count($custom_validation) > 0) {
-
                     $validation = $custom_validation;
                 } else {
-
                     $validation = [
                         'mimes:' . $mimes,
                         'max:' . $max_size,
                     ];
 
                 }
-
                 $validator = \Validator::make($request->all(), [
                     $key_name => $validation,
                 ]);
-
                 if ($validator->fails()) {
-
                     $res = [
                         'flag' => 0,
                         'msg' => $validator->messages()->first(),
                     ];
-
                     return $res;
                 } else {
-
                     $name = $name;
-
                     if ($settings['storage_setting'] == 'local') {
-//                    dd(\Storage::disk(),$path);
                         $request->$key_name->move(storage_path($path), $name);
                         $path = $path . $name;
                     } else if ($settings['storage_setting'] == 'wasabi') {
-
                         $path = \Storage::disk('wasabi')->putFileAs(
                             $path,
                             $file,
                             $name
                         );
-
-                        // $path = $path.$name;
-
                     } else if ($settings['storage_setting'] == 's3') {
-
                         $path = \Storage::disk('s3')->putFileAs(
                             $path,
                             $file,
                             $name
                         );
-                        // $path = $path.$name;
-                        // dd($path);
                     }
 
                     $res = [

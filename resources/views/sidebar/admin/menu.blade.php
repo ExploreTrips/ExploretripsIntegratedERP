@@ -1,7 +1,9 @@
 @php
     use App\Models\Utility;
     $setting = \App\Models\Utility::settings();
-    $logo = \App\Models\Utility::get_file('uploads/logo');
+    // $logo = \App\Models\Utility::get_file('uploads/logo');
+    $logo = Storage::url('uploads/logo');
+
     $company_logo = $setting['company_logo_dark'] ?? '';
     $company_logos = $setting['company_logo_light'] ?? '';
     $company_small_logo = $setting['company_small_logo'] ?? '';

@@ -7,10 +7,9 @@
     $company_logos = $setting['company_logo_light'] ?? '';
     $company_favicon = $setting['company_favicon'] ?? '';
 
-    $logo = \App\Models\Utility::get_file('uploads/logo/');
-
-     $color = !empty($setting['color']) ? $setting['color'] : 'theme-3';
-
+    // $logo = \App\Models\Utility::get_file('uploads/logo/');
+    $logo = Storage::url('uploads/logo/');
+    $color = !empty($setting['color']) ? $setting['color'] : 'theme-3';
     if(isset($setting['color_flag']) && $setting['color_flag'] == 'true')
     {
         $themeColor = 'custom-color';

@@ -286,7 +286,6 @@ class EmployeeController extends Controller
         }
 
         $employee = Employees::findOrFail($id);
-
         if ($request->hasFile('document')) {
             foreach ($request->file('document') as $key => $file) {
                 if (!empty($file)) {
