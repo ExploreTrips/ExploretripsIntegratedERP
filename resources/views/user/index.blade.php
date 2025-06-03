@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 @php
-    $profile = \App\Models\Utility::get_file('uploads/avatar');
+    $avatars = \App\Models\Utility::get_file('avatars/');
     $user = auth()->user();
 @endphp
 @section('page-title')
@@ -150,10 +150,29 @@
                             </div>
 
                             <div class="card-body full-card">
-                                <div class="img-fluid rounded-circle card-avatar">
-                                    <img src="{{ !empty($user->avatar) ? \App\Models\Utility::get_file($user->avatar) : asset(Storage::url('avatars/__avatar.png')) }}"
-                                        class="" width="120px" height="120px" alt="user-image">
-                                </div>
+                                <div style="text-align: center;">
+                                    <div class="card-avatar" style="
+                                        width: 120px;
+                                        height: 120px;
+                                        overflow: hidden;
+                                        border-radius: 12px;
+                                        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+                                        display: inline-block;
+                                    ">
+                                        <img
+                                            src="{{ !empty($user->avatar) ? $avatars . $user->avatar : $avatars . 'avatar.png' }}"
+                                            alt="user-image"
+                                            style="
+                                                width: 100%;
+                                                height: 100%;
+                                                object-fit: cover;
+                                                display: block;
+                                            "
+                                        >
+                                    </div>
+                                    </div>
+
+
                                 <h4 class=" mt-3 text-primary">{{ $user->name }}</h4>
                                 @if ($user->delete_status == 0)
                                     <h5 class="office-time mb-0">{{ __('Soft Deleted') }}</h5>

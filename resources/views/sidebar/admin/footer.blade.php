@@ -81,10 +81,7 @@
 
 <script>
 
-
-
-
-    feather.replace();
+feather.replace();
     var pctoggle = document.querySelector("#pct-toggler");
     if (pctoggle) {
         pctoggle.addEventListener("click", function () {
@@ -127,9 +124,6 @@
                 .classList.remove("transprent-bg");
         }
     });
-
-
-
 
     function removeClassByPrefix(node, prefix) {
         for (let i = 0; i < node.classList.length; i++) {
